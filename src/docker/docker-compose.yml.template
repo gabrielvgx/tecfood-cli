@@ -1,0 +1,27 @@
+# - MNEMONICS_PATTERN: {SERVICENAME}_*
+# {SERVICE_NAME}_BASEPATH
+# {SERVICE_NAME}_CONTAINER_NAME
+# {SERVICE_NAME}_EXT_PORT_{number_internal_port}
+# {SERVICE_NAME}_IMAGE
+version: "3"
+services:
+  birt:
+    image: <>BIRT_IMAGE<>
+    container_name: <>BIRT_CONTAINER_NAME<>
+    environment:
+      - http_proxy=http://192.168.122.121:3128
+      - https_proxy=http://192.168.122.121:3128
+    volumes:
+      - <>BIRT_BASEPATH<>:/var/www
+    ports:
+      - "<>BIRT_EXT_PORT_9191<>:9191"
+      - "<>BIRT_EXT_PORT_8080<>:8080"
+  basedev:
+    image: <>BASEDEV_IMAGE<>
+    container_name: <>BASEDEV_CONTAINER_NAME<>
+    volumes:
+      - /u01:/u01
+      - <>BASEDEV_BASEPATH<>:/home/developer/workfolder
+      - <>BASEDEV_SSHPATH<>:/root/.ssh
+    ports:
+      - "<>BASEDEV_EXT_PORT_80<>:80"

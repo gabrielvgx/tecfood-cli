@@ -1,0 +1,5 @@
+{
+    "BIRT_IMAGE"   : "dockerhub.teknisa.com/birt:latest",
+    "BASEDEV_IMAGE": "dockerhub.teknisa.com/c9-php7:latest",
+    "APP_IMAGE"    : ""
+}
