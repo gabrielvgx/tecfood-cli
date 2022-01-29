@@ -1,4 +1,5 @@
 import prompts from 'prompts';
+import async from 'async';
 
 import { confirm } from './template_option.js';
 import birt from './types/birt.js';
@@ -29,7 +30,16 @@ const question = {
             },
             
         );
-        let optUseDefault = await confirm("Usar configurações padrões", true);
+        let optUseDefault = await prompts({
+            type: 'select',
+            name: 'value',
+            message: 'Modo de instalação',
+            choices: [
+                { title: 'Padrão', description: 'Configuração automatizada (modo silencioso)', value: true },
+                { title: 'Avançado', description: 'Configuração detalhada com interações com usuário recorrentes', value: false, },
+            ],
+            initial: 0
+        });
         return {
             environments: environments.value,
             useDefault: optUseDefault.value
@@ -45,8 +55,12 @@ const question = {
         if(useDefault){
             return;
         }
-        questions.forEach( async question => {
-            let resp = await question.execute();
+        async.eachSeries(questions, function ( question, callback ) {
+            if(environments.includes(question.name)){
+                question.execute().then(callback);
+            } else {
+                callback();
+            }
         });
     }
 }

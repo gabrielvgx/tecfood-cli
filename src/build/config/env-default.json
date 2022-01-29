@@ -1,0 +1,15 @@
+{
+    "BIRT_IMAGE"   : "dockerhub.teknisa.com/birt:latest",
+    "BASEDEV_IMAGE": "dockerhub.teknisa.com/c9-php7:latest",
+    "APP_IMAGE"    : "",
+    
+    "BIRT_BASEPATH": "<>HOME_PATH<>/workfolder",
+    "BIRT_EXT_PORT_9191": "9191",
+    "BIRT_EXT_PORT_8080": "8080",
+    "BIRT_CONTAINER_NAME": "birt",
+
+    "BASEDEV_CONTAINER_NAME": "teknisa-container",
+    "BASEDEV_BASEPATH": "<>HOME_PATH<>/workfolder",
+    "BASEDEV_SSHPATH": "<>HOME_PATH<>/.ssh",
+    "BASEDEV_EXT_PORT_80": "3000"
+}

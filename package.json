@@ -5,13 +5,16 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "build": "node src/build/buildTemplate.js",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Gabriel Xavier",
   "license": "ISC",
   "dependencies": {
+    "async": "^3.2.3",
     "chalk": "^5.0.0",
+    "listr": "^0.14.3",
     "ora": "^6.0.1",
     "prompts": "^2.4.2"
   }
