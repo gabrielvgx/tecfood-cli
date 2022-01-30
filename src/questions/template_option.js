@@ -34,14 +34,16 @@ const templateOption = {
             message
         };
         return await prompts(options);
-    }
+    },
 }
 const {
     confirm,
-    text
+    text,
+    password
 } = templateOption;
 export default templateOption;
 export {
     confirm,
-    text
+    text,
+    password
 };

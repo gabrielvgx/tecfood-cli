@@ -1,0 +1,534 @@
+{
+    "tecfood": {
+      "repositories": [
+        {
+          "path": "tecfood",
+          "url": "git@gitlab.teknisa.com:tecfood/tecfood.git"
+        }
+      ],
+      "requiredModules": [
+        "acl",
+        "login"
+      ],
+      "modules": [
+        "pla",
+        "fai",
+        "cus",
+        "coz",
+        "gop",
+        "gql",
+        "cmp",
+        "sup",
+        "fin",
+        "ctb",
+        "fis",
+        "ped",
+        "est",
+        "df",
+        "par",
+        "cadSup",
+        "cadEst",
+        "cadFin",
+        "cadFis",
+        "cadPed",
+        "cadExp",
+        "cadCdp",
+        "cadCtb",
+        "cadGes",
+        "dro",
+        "mym",
+        "myo",
+        "tco",
+        "acl",
+        "login",
+        "dsb",
+        "agendador",
+        "opl",
+        "wkf"
+      ]
+    },
+    "acl": {
+      "repositories": [
+        {
+          "path": "acl",
+          "branch": "PROD_2272_2.8.1",
+          "url": "git@192.168.122.56:teknisa/acl.git"
+        },
+        {
+          "path": "acl/mobile",
+          "branch": "PROD_2272_2.8.1",
+          "url": "git@192.168.122.56:teknisa/aclfrontend.git"
+        },
+        {
+          "path": "teknisa/acl",
+          "branch": "PROD_2272_2.8.1",
+          "url": "git@192.168.122.56:teknisa/aclbackend.git"
+        }
+      ]
+    },
+    "login": {
+      "repositories": [
+        {
+          "path": "login",
+          "branch": "PROD_1874_4.7.1",
+          "url": "git@gitlab.teknisa.com:teknisa/loginsetup.git"
+        }
+      ]
+    },
+    "pla": {
+      "repositories": [
+        {
+          "path": "pla",
+          "url": "git@gitlab.teknisa.com:tecfood/pla.git"
+        },
+        {
+          "path": "pla/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/plaFrontend.git"
+        },
+        {
+          "path": "teknisa/pla",
+          "url": "git@gitlab.teknisa.com:tecfood/plaBackend.git"
+        }
+      ]
+    },
+    "fai": {
+      "repositories": [
+        {
+          "path": "fai",
+          "url": "git@gitlab.teknisa.com:tecfood/fai.git"
+        },
+        {
+          "path": "fai/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/faifrontend.git"
+        },
+        {
+          "path": "teknisa/fai",
+          "url": "git@gitlab.teknisa.com:tecfood/faibackend.git"
+        }
+      ]
+    },
+    "cus": {
+      "repositories": [
+        {
+          "path": "cus",
+          "url": "git@gitlab.teknisa.com:tecfood/cus.git"
+        },
+        {
+          "path": "cus/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/cusfrontend.git"
+        },
+        {
+          "path": "teknisa/cus",
+          "url": "git@gitlab.teknisa.com:tecfood/cusbackend.git"
+        }
+      ]
+    },
+    "coz": {
+      "repositories": [
+        {
+          "path": "coz",
+          "url": "git@gitlab.teknisa.com:tecfoodd/coz.git"
+        },
+        {
+          "path": "coz/mobile",
+          "url": "git@gitlab.teknisa.com:tecfoodd/cozfrontend.git"
+        },
+        {
+          "path": "teknisa/coz",
+          "url": "git@gitlab.teknisa.com:tecfoodd/cozbackend.git"
+        }
+      ]
+    },
+    "gop": {
+      "repositories": [
+        {
+          "path": "gop",
+          "url": "git@gitlab.teknisa.com:tecfood/gop.git"
+        }
+      ]
+    },
+    "gql": {
+      "repositories": [
+        {
+          "path": "gql",
+          "url": "git@gitlab.teknisa.com:tecfood/tecfood-gestao-da-qualificacao-gql.git"
+        },
+        {
+          "path": "gql/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/gqlfrontend.git"
+        },
+        {
+          "path": "teknisa/gql",
+          "url": "git@gitlab.teknisa.com:tecfood/gqlbackend.git"
+        }
+      ]
+    },
+    "cmp": {
+      "repositories": [
+        {
+          "path": "cmp",
+          "url": "git@192.168.122.56:teknisa/cmp.git"
+        },
+        {
+          "path": "cmp/mobile",
+          "url": "git@192.168.122.56:teknisa/cmpfrontend.git"
+        },
+        {
+          "path": "teknisa/cmp",
+          "url": "git@192.168.122.56:teknisa/cmpbackend.git"
+        }
+      ]
+    },
+    "sup": {
+      "repositories": [
+        {
+          "path": "sup",
+          "url": "git@gitlab.teknisa.com:tecfood/sup.git"
+        },
+        {
+          "path": "sup/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/supfrontend.git"
+        },
+        {
+          "path": "teknisa/sup",
+          "url": "git@gitlab.teknisa.com:tecfood/supbackend.git"
+        }
+      ]
+    },
+    "fin": {
+      "repositories": [
+        {
+          "path": "fin",
+          "url": "git@192.168.122.56:teknisa/fin.git"
+        },
+        {
+          "path": "fin/mobile",
+          "url": "git@192.168.122.56:teknisa/finfrontend.git"
+        },
+        {
+          "path": "teknisa/fin",
+          "url": "git@192.168.122.56:teknisa/finbackend.git"
+        }
+      ]
+    },
+    "ctb": {
+      "repositories": [
+        {
+          "path": "ctb",
+          "url": "git@192.168.122.56:teknisa/ctb.git"
+        },
+        {
+          "path": "ctb/mobile",
+          "url": "git@192.168.122.56:teknisa/ctbfrontend.git"
+        },
+        {
+          "path": "teknisa/ctb",
+          "url": "git@192.168.122.56:teknisa/ctbbackend.git"
+        }
+      ]
+    },
+    "fis": {
+      "repositories": [
+        {
+          "path": "fis",
+          "url": "git@192.168.122.56:teknisa/fis.git"
+        },
+        {
+          "path": "fis/mobile",
+          "url": "git@192.168.122.56:teknisa/fisfrontend.git"
+        },
+        {
+          "path": "teknisa/fis",
+          "url": "git@192.168.122.56:teknisa/fisbackend.git"
+        }
+      ]
+    },
+    "ped": {
+      "repositories": [
+        {
+          "path": "ped",
+          "url": "git@192.168.122.56:teknisa/ped.git"
+        },
+        {
+          "path": "ped/mobile",
+          "url": "git@192.168.122.56:teknisa/pedfrontend.git"
+        },
+        {
+          "path": "teknisa/ped",
+          "url": "git@192.168.122.56:teknisa/pedbackend.git"
+        }
+      ]
+    },
+    "est": {
+      "repositories": [
+        {
+          "path": "est",
+          "url": "git@192.168.122.56:teknisa/est.git"
+        },
+        {
+          "path": "est/mobile",
+          "url": "git@192.168.122.56:teknisa/estfrontend.git"
+        },
+        {
+          "path": "teknisa/est",
+          "url": "git@192.168.122.56:teknisa/estbackend.git"
+        }
+      ]
+    },
+    "df": {
+      "repositories": [
+        {
+          "path": "df",
+          "url": "git@192.168.122.56:teknisa/df.git"
+        },
+        {
+          "path": "df/mobile",
+          "url": "git@192.168.122.56:teknisa/dffrontend.git"
+        },
+        {
+          "path": "teknisa/df",
+          "url": "git@192.168.122.56:teknisa/dfbackend.git"
+        }
+      ]
+    },
+    "par": {
+      "repositories": [
+        {
+          "path": "par",
+          "url": "git@192.168.122.56:pebbian/pebbian-crm-parceiros.git"
+        },
+        {
+          "path": "par/mobile",
+          "url": "git@192.168.122.56:pebbian/parfrontend.git"
+        },
+        {
+          "path": "teknisa/par",
+          "url": "git@192.168.122.56:pebbian/parbackend.git"
+        }
+      ]
+    },
+    "cadSup": {
+      "repositories": [
+        {
+          "path": "cadSup",
+          "url": "git@192.168.122.56:pebbian/cad_sup.git"
+        },
+        {
+          "path": "cadSup/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_supfrontend.git"
+        },
+        {
+          "path": "teknisa/cadSup",
+          "url": "git@192.168.122.56:pebbian/cad_supbackend.git"
+        }
+      ]
+    },
+    "cadEst": {
+      "repositories": [
+        {
+          "path": "cadEst",
+          "url": "git@192.168.122.56:pebbian/cad_est.git"
+        },
+        {
+          "path": "cadEst/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_estfrontend.git"
+        },
+        {
+          "path": "teknisa/cadEst",
+          "url": "git@192.168.122.56:pebbian/cad_estbackend.git"
+        }
+      ]
+    },
+    "cadFin": {
+      "repositories": [
+        {
+          "path": "cadFin",
+          "url": "git@192.168.122.56:pebbian/cad_fin.git"
+        },
+        {
+          "path": "cadFin/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_finfrontend.git"
+        },
+        {
+          "path": "teknisa/cadFin",
+          "url": "git@192.168.122.56:pebbian/cad_finbackend.git"
+        }
+      ]
+    },
+    "cadFis": {
+      "repositories": [
+        {
+          "path": "cadFis",
+          "url": "git@192.168.122.56:pebbian/cad_fis.git"
+        },
+        {
+          "path": "cadFis/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_fisfrontend.git"
+        },
+        {
+          "path": "teknisa/cadFis",
+          "url": "git@192.168.122.56:pebbian/cad_fisbackend.git"
+        }
+      ]
+    },
+    "cadPed": {
+      "repositories": [
+        {
+          "path": "cadPed",
+          "url": "git@192.168.122.56:pebbian/cad_ped.git"
+        },
+        {
+          "path": "cadPed/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_pedfrontend.git"
+        },
+        {
+          "path": "teknisa/cadPed",
+          "url": "git@192.168.122.56:pebbian/cad_pedbackend.git"
+        }
+      ]
+    },
+    "cadExp": {
+      "repositories": [
+        {
+          "path": "cadExp",
+          "url": "git@192.168.122.56:pebbian/cad_exp.git"
+        },
+        {
+          "path": "cadExp/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_expfrontend.git"
+        },
+        {
+          "path": "teknisa/cadExp",
+          "url": "git@192.168.122.56:pebbian/cad_expbackend.git"
+        }
+      ]
+    },
+    "cadCdp": {
+      "repositories": [
+        {
+          "path": "cadCdp",
+          "url": "git@192.168.122.56:pebbian/cad_cdp.git"
+        },
+        {
+          "path": "cadCdp/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_cdpfrontend.git"
+        },
+        {
+          "path": "teknisa/cadCdp",
+          "url": "git@192.168.122.56:pebbian/cad_cdpbackend.git"
+        }
+      ]
+    },
+    "cadCtb": {
+      "repositories": [
+        {
+          "path": "cadCtb",
+          "url": "git@192.168.122.56:pebbian/cad_ctb.git"
+        },
+        {
+          "path": "cadCtb/mobile",
+          "url": "git@192.168.122.56:pebbian/cad_ctbfrontend.git"
+        },
+        {
+          "path": "teknisa/cadCtb",
+          "url": "git@192.168.122.56:pebbian/cad_ctbbackend.git"
+        }
+      ]
+    },
+    "mym": {
+      "repositories": [
+        {
+          "path": "mym",
+          "url": "git@gitlab.teknisa.com:tecfood/mym.git"
+        },
+        {
+          "path": "mym/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/mymfrontend.git"
+        },
+        {
+          "path": "teknisa/mym",
+          "url": "git@gitlab.teknisa.com:tecfood/mymbackend.git"
+        }
+      ]
+    },
+    "myo": {
+      "repositories": [
+        {
+          "path": "myo",
+          "url": "git@gitlab.teknisa.com:tecfood/myo.git"
+        },
+        {
+          "path": "myo/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/myofrontend.git"
+        },
+        {
+          "path": "teknisa/myo",
+          "url": "git@gitlab.teknisa.com:tecfood/myobackend.git"
+        }
+      ]
+    },
+    "tco": {
+      "repositories": [
+        {
+          "path": "tco",
+          "url": "git@gitlab.teknisa.com:tecfood/tco.git"
+        },
+        {
+          "path": "tco/mobile",
+          "url": "git@gitlab.teknisa.com:tecfood/tcofrontend.git"
+        },
+        {
+          "path": "teknisa/tco",
+          "url": "git@gitlab.teknisa.com:tecfood/tcobackend.git"
+        }
+      ]
+    },
+    "dsb": {
+      "repositories": [
+        {
+          "path": "dsb",
+          "url": "git@gitlab.teknisa.com:tecfood/tecfood-corp-dashboard.git"
+        }
+      ]
+    },
+    "dro": {
+      "repositories": [
+        {
+          "path": "dro",
+          "url": "git@gitlab.teknisa.com:tecfood/tecfood-corp-demonstrativo-de-resultado-operacional.git"
+        }
+      ]
+    },
+    "cadGes": {
+      "repositories": [
+        {
+          "path": "cadGes",
+          "url": "git@gitlab.teknisa.com:tecfood/tecfood-corp-cadastros-de-gestao.git"
+        }
+      ]
+    },
+    "agendador": {
+      "repositories": [
+        {
+          "path": "agendador",
+          "url": "git@gitlab.teknisa.com:teknisa/teknisa-agendador.git"
+        }
+      ]
+    },
+    "opl": {
+      "repositories": [
+        {
+          "path": "opl",
+          "url": "git@192.168.122.56:tecfood/tecfood-operador-logistico.git"
+        },
+        {
+          "path": "opl/mobile",
+          "url": "git@192.168.122.56:tecfood/olfrontend.git"
+        },
+        {
+          "path": "teknisa/opl",
+          "url": "git@192.168.122.56:tecfood/olbackend.git"
+        }
+      ]
+    }
+  }
