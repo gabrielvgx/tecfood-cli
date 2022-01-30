@@ -26,6 +26,14 @@ const templateOption = {
             return options;
         }
         return await prompts(options);
+    },
+    async password( message = "Password" ){
+        let options = {
+            type: 'password',
+            name: 'value',
+            message
+        };
+        return await prompts(options);
     }
 }
 const {

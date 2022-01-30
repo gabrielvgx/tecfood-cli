@@ -26,11 +26,15 @@ const buildTemplate = {
         }
         const ENV = JSON.parse(fs.readFileSync(PATH_ENV, 'utf-8'));
         const FILES = [
-            path.resolve('src/docker/docker-compose.yml.template')
+            {
+                filePath: path.resolve('src/docker/docker-compose.yml.template'),
+                onBeforeWrite: ( fileContent ) => fileContent.replace(/#.+/gi, '').replace(/^\n/gim, '')
+            }
         ];
-        const replaceMnemonics = fileName => {
-            mnemonic.replaceFromMap(fileName, ENV);
-        }
+        const replaceMnemonics = configFile => {
+            const { filePath, onBeforeWrite = null } = configFile;
+            mnemonic.replaceFromMap(filePath, ENV, { onBeforeWrite });
+        };
         FILES.forEach( replaceMnemonics );
     }
 };

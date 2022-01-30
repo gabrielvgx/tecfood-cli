@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "node src/build/buildTemplate.js",
+    "cleanBuild": "node src/build/cleanBuild.js",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,7 +1,17 @@
 {
-    "BIRT_IMAGE"   : "dockerhub.teknisa.com/birt:latest",
-    "BASEDEV_IMAGE": "dockerhub.teknisa.com/c9-php7:latest",
-    "APP_IMAGE"    : "",
+    "SERVICES": {
+        "BIRT": {
+            "REGISTRY": "dockerhub.teknisa.com",
+            "IMAGE": "birt",
+            "TAG": "latest"
+        },
+        "BASEDEV": {
+            "REGISTRY": "dockerhub.teknisa.com",
+            "IMAGE": "c9-php7",
+            "TAG": "latest"
+        },
+        "APP": {}
+    },
     
     "BIRT_BASEPATH": "<>HOME_PATH<>/workfolder",
     "BIRT_EXT_PORT_9191": "9191",

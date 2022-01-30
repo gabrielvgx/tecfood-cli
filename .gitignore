@@ -2,5 +2,6 @@ node_modules
 
 # generated config files
 src/docker/docker-compose.yml
-src/build/config/config.json
+src/docker/credentials/config.json
+
 src/build/config/environment.json 
