@@ -28,7 +28,8 @@ const basedev = {
             BASEDEV_CONTAINER_NAME,
             BASEDEV_EXT_PORT_80,
             BASEDEV_SSHPATH: SSH_PATH || ''
-        }
+        };
+        return RESPONSE;
     }
 }
 export default basedev;

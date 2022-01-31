@@ -22,6 +22,6 @@ services:
     volumes:
       - /u01:/u01
       - <>BASEDEV_BASEPATH<>:/home/developer/workfolder
-      - <>BASEDEV_SSHPATH<>:/root/.ssh
+      <>BASEDEV_SSHPATH_VOLUME<>
     ports:
       - "<>BASEDEV_EXT_PORT_80<>:80"

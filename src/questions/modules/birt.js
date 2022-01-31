@@ -14,7 +14,8 @@ const birt = {
             BIRT_CONTAINER_NAME,
             BIRT_EXT_PORT_9191,
             BIRT_EXT_PORT_8080
-        }
+        };
+        return RESPONSE;
     }
 }
 export default birt;

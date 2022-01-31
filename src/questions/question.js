@@ -2,25 +2,19 @@ import prompts from 'prompts';
 import async from 'async';
 
 import { confirm, text, password } from './template_option.js';
-import birt from './types/birt.js';
-import app from './types/app.js';
-import basedev from './types/basedev.js';
+import birt from './modules/birt.js';
+import app from './modules/app.js';
+import basedev from './modules/basedev.js';
 import UtilApp from '../util/app.js';
 import docker from '../util/docker.js';
 
 const question = {
-    getTypes(){
-        return {
-            birt   : birt_options,
-            app    : app_options,
-            basedev: basedev_options
-        };
-    },
     async requestCredentialsDocker( allRegistry ){
         let credentials = {};
+        const OFFICIAL_DOCKER_REGISTRY = 'hub.docker.com';
         return async.eachSeries(allRegistry, function(registry, callback){
-            text(`Usuário para login docker (${registry || 'Docker Hub Oficial'})`).then( ({value: USER}) => {
-                password(`Senha para login docker (${registry || 'Docker Hub Oficial'})`).then( ({value: PASSWORD}) => {
+            text(`Usuário para login docker (${registry || OFFICIAL_DOCKER_REGISTRY})`).then( ({value: USER}) => {
+                password(`Senha para login docker (${registry || OFFICIAL_DOCKER_REGISTRY})`).then( ({value: PASSWORD}) => {
                     credentials[registry] = { USER, PASSWORD };
                     callback();
                 });
@@ -73,17 +67,28 @@ const question = {
             basedev
         ];
         const { environments, useDefault } = await this.initialQuest();
-        if(useDefault){
-            return;
+        let promiseQuestions = Promise.resolve(null);
+        if( useDefault ){
+            UtilApp.generateEnvFile();
+        } else {
+            let responseQuestions = {};
+            promiseQuestions = async.eachSeries(questions, function ( question, callback ) {
+                if(environments.includes(question.name)){
+                    question.execute().then( response => {
+                        Object.assign(responseQuestions, response);
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }).then( _ => responseQuestions);
         }
-        const ENV = UtilApp.getEnv();
-        async.eachSeries(questions, function ( question, callback ) {
-            if(environments.includes(question.name)){
-                question.execute().then(callback);
-            } else {
-                callback();
+        promiseQuestions.then( function( responseQuestions ) {
+            if(responseQuestions){
+                UtilApp.generateEnvFile(responseQuestions);
             }
-        }).then(function(){
+            UtilApp.buildTemplateFiles();
+            const ENV = UtilApp.getEnv(); //env.json
             const SERVICES = ENV.SERVICES;
             let registry = new Set();
             environments.forEach( serviceName => {

@@ -1,25 +1,18 @@
 import { exec } from 'child_process';
 import path from 'path';
 import { getAppRootPath, getPathConfigFolderDocker } from './app.js';
+import terminal from './terminal.js';
 
 const docker = {
     async registerCredentials(USER, PASSWORD, REGISTRY = "", pathSaveCredential = null){
-        const APP_ROOT_PATH = getAppRootPath();
         const PATH_SAVE_CREDENTIAL = pathSaveCredential || getPathConfigFolderDocker();
-        let dockerLoginScript = path.join(APP_ROOT_PATH, 'src', 'util', 'scripts', 'docker_create_credential.sh');
-        let resolvePromise, rejectPromise;
-        let promise = new Promise((resolve, reject)=>{
-            resolvePromise = resolve;
-            rejectPromise = reject;
+        const ARGS = `"${REGISTRY}" "${USER}" "${PASSWORD}" "${PATH_SAVE_CREDENTIAL}"`;
+        return terminal.execute(`docker_create_credential.sh`, ARGS, true);
+    },
+    async getOfficialRegistry(){
+        return termina.execute(`docker info --format '{{json .}}'`).then( response => {
+            return JSON.parse(response).IndexServerAddress;
         });
-        exec(`/bin/bash ${dockerLoginScript} "${REGISTRY}" "${USER}" "${PASSWORD}" "${PATH_SAVE_CREDENTIAL}"`, ( err, stdout, stderr ) => {
-            if( err ) {
-                rejectPromise(err);
-            } else {
-                resolvePromise('sucess');
-            }
-        });
-        return promise;
     }
 };
 

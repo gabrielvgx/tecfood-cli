@@ -1,1 +1,0 @@
-# Pasta Utilizada para salvar config.json com credenciais para operações docker
