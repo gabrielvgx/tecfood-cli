@@ -1,11 +1,20 @@
 import ora from 'ora';
 import chalk from 'chalk';
-
-import prompts from 'prompts';
-import question from './src/questions/question.js';
+import path from 'path';
 import Listr from 'listr';
+import prompts from 'prompts';
 
-question.executeQuestions();
+import question from './src/questions/question.js';
+import app from './src/util/app.js';
+import docker from './src/util/docker.js';
+
+question.executeQuestions().then( services => {
+    const ROOT_PATH = app.getAppRootPath();
+    const dockerComposeFile = path.join(ROOT_PATH, 'src', 'docker', 'docker-compose.yml');
+    if(app.hasAccess(dockerComposeFile)){
+        docker.runServices( services );
+    }
+});
 // let time_start = Date.now();
 // const tasks = new Listr([
 //     {

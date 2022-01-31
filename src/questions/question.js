@@ -66,6 +66,10 @@ const question = {
             app,
             basedev
         ];
+        let resolveP;
+        const promise = new Promise( resolve => {
+            resolveP = resolve;
+        });
         const { environments, useDefault } = await this.initialQuest();
         let promiseQuestions = Promise.resolve(null);
         if( useDefault ){
@@ -97,9 +101,12 @@ const question = {
                 }
             });
             if( registry.size ) {
-                return this.requestCredentialsDocker(Array.from(registry)).then(this.persistCredentialsDocker);
+                this.requestCredentialsDocker(Array.from(registry)).then(this.persistCredentialsDocker).then(_ => resolveP(environments));
+            } else {
+                resolveP(environments);
             }
         }.bind(this));
+        return promise;
     }
 }
 
