@@ -28,7 +28,7 @@ const docker = {
             const SERVICE_NAME = serviceName.toLowerCase();
             const ARGS = `"${COMPOSE_FILE_PATH}" "${SERVICE_NAME}"`;
             promises.push(
-                terminal.execute(`docker_up_service.sh`, ARGS, true);
+                terminal.execute(`docker_up_service.sh`, ARGS, true)
             );
         })
         return Promise.allSettled( promises );
