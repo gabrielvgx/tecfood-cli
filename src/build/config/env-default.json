@@ -25,5 +25,7 @@
     "BASEDEV_SSHPATH": "<>HOME_PATH<>/.ssh",
     "BASEDEV_EXT_PORT_80": "3000",
 
-    "APP_CONTAINER_NAME": "app-container"
+    "APP_CONTAINER_NAME": "app-container",
+    "APP_BASE_PATH": "<>HOME_PATH<>/workfolder",
+    "APP_SSHPATH": "<>HOME_PATH<>/.ssh"
 }

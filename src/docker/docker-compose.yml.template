@@ -9,8 +9,12 @@ services:
     image: <>APP_IMAGE<>
     container_name: <>APP_CONTAINER_NAME<>
     build: ./build/app
+    working_dir: /var/www
     restart: always
     tty: true
+    volumes:
+      - <>APP_BASE_PATH<>:/var/www
+      <>APP_SSHPATH_VOLUME<>
     networks:
       - dev_network
   birt:

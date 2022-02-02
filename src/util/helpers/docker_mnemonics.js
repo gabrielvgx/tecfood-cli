@@ -1,5 +1,4 @@
 const DockerMnemonicHelper = {
-    _: `- <>BASEDEV_SSHPATH<>:/root/.ssh`,
     resolveDockerImageMnemonics( ENV ){
         const ENV_MAP = Object.assign({}, ENV);
         const IMAGE_MNEMONICS = [
@@ -26,6 +25,11 @@ const DockerMnemonicHelper = {
             ENV.BASEDEV_SSHPATH_VOLUME = `- ${ENV.BASEDEV_SSHPATH}:/root/.ssh`;
         } else {
             ENV.BASEDEV_SSHPATH_VOLUME = '';
+        }
+        if ( ENV.APP_SSHPATH ) {
+            ENV.APP_SSHPATH_VOLUME = `- ${ENV.APP_SSHPATH}:/root/.ssh`;
+        } else {
+            ENV.APP_SSHPATH_VOLUME = '';
         }
     },
     run( ENV ){
