@@ -1,5 +1,5 @@
 import prompts from 'prompts';
-import async from 'async';
+import { eachSeries } from 'async';
 
 import { confirm, text, password } from './template_option.js';
 import birt from './modules/birt.js';
@@ -12,7 +12,7 @@ const question = {
     async requestCredentialsDocker( allRegistry ){
         let credentials = {};
         const OFFICIAL_DOCKER_REGISTRY = 'hub.docker.com';
-        return async.eachSeries(allRegistry, function(registry, callback){
+        return eachSeries(allRegistry, function(registry, callback){
             text(`Usuário para login docker (${registry || OFFICIAL_DOCKER_REGISTRY})`).then( ({value: USER}) => {
                 password(`Senha para login docker (${registry || OFFICIAL_DOCKER_REGISTRY})`).then( ({value: PASSWORD}) => {
                     credentials[registry] = { USER, PASSWORD };
@@ -22,7 +22,7 @@ const question = {
         }).then(_ => credentials);
     },
     async persistCredentialsDocker( credentials ){
-        return async.eachSeries(Object.keys(credentials), function( REGISTRY, callback) {
+        return eachSeries(Object.keys(credentials), function( REGISTRY, callback) {
             const { USER, PASSWORD } = credentials[REGISTRY]; 
             return docker.registerCredentials(USER, PASSWORD, REGISTRY).then(function(){
                 callback();
@@ -76,7 +76,7 @@ const question = {
             UtilApp.generateEnvFile();
         } else {
             let responseQuestions = {};
-            promiseQuestions = async.eachSeries(questions, function ( question, callback ) {
+            promiseQuestions = eachSeries(questions, function ( question, callback ) {
                 if(environments.includes(question.name)){
                     question.execute().then( response => {
                         Object.assign(responseQuestions, response);

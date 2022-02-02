@@ -5,6 +5,14 @@
 # {SERVICE_NAME}_IMAGE
 version: "3"
 services:
+  app:
+    image: <>APP_IMAGE<>
+    container_name: <>APP_CONTAINER_NAME<>
+    build: ./build/app
+    restart: always
+    tty: true
+    networks:
+      - dev_network
   birt:
     image: <>BIRT_IMAGE<>
     container_name: <>BIRT_CONTAINER_NAME<>
@@ -16,6 +24,9 @@ services:
     ports:
       - "<>BIRT_EXT_PORT_9191<>:9191"
       - "<>BIRT_EXT_PORT_8080<>:8080"
+    networks:
+      - dev_network
+    restart: always
   basedev:
     image: <>BASEDEV_IMAGE<>
     container_name: <>BASEDEV_CONTAINER_NAME<>
@@ -25,3 +36,10 @@ services:
       <>BASEDEV_SSHPATH_VOLUME<>
     ports:
       - "<>BASEDEV_EXT_PORT_80<>:80"
+    networks:
+      - dev_network
+    restart: always
+networks:
+  dev_network:
+    name: dev_network
+    driver: bridge

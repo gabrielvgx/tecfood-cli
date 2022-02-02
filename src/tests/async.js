@@ -1,4 +1,4 @@
-import async from 'async';
+import { eachSeries } from 'async';
 
 let longProcess = function(time){
     return new Promise( resolve => {
@@ -9,7 +9,7 @@ let longProcess = function(time){
 };
 
 let responses = [];
-let promise = async.eachSeries([1,2,3], function(item, callback){
+let promise = eachSeries([1,2,3], function(item, callback){
     longProcess(item*1000).then(function(response){
         responses.push(response);
         callback();
