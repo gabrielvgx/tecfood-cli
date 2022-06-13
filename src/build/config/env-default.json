@@ -12,6 +12,12 @@
         },
         "APP": {
             "IMAGE": "app-image"
+        },
+        "MONGO": {
+            "IMAGE": "mongo:3.2"
+        },
+        "ALGORITMO": {
+            "IMAGE": "node:10"
         }
     },
     
@@ -27,5 +33,12 @@
 
     "APP_CONTAINER_NAME": "app-container",
     "APP_BASE_PATH": "<>HOME_PATH<>/workfolder",
-    "APP_SSHPATH": "<>HOME_PATH<>/.ssh"
+    "APP_SSHPATH": "<>HOME_PATH<>/.ssh",
+
+    "MONGO_CONTAINER_NAME": "mongo-container",
+    "MONGO_EXT_PORT_27017": "27017",
+
+    "ALGORITMO_CONTAINER_NAME": "algoritmo-container",
+    "ALGORITMO_BASEPATH": "<>HOME_PATH<>/workfolder/algoritmo",
+    "ALGORITMO_EXT_PORT_9191": "9521"
 }

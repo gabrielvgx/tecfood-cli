@@ -1,8 +1,7 @@
-import os from 'os';
 import fs from 'fs';
 import path from 'path';
 import mnemonic from '../util/mnemonic.js';
-import { generateEnvFile } from '../util/app.js';
+import UtilApp from '../util/app.js';
 
 const buildTemplate = {
     hasAccess(file){
@@ -16,7 +15,7 @@ const buildTemplate = {
     run(){
         const PATH_ENV = path.resolve('src/build/config/environment.json');
         if(!this.hasAccess(PATH_ENV)){
-            generateEnvFile();
+            UtilApp.generateEnvFile();
         }
         const ENV = JSON.parse(fs.readFileSync(PATH_ENV, 'utf-8'));
         const FILES = [

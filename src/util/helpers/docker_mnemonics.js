@@ -2,9 +2,11 @@ const DockerMnemonicHelper = {
     resolveDockerImageMnemonics( ENV ){
         const ENV_MAP = Object.assign({}, ENV);
         const IMAGE_MNEMONICS = [
-            { SERVICE_NAME: 'BIRT',    MNEMONIC_IMAGE_NAME: 'BIRT_IMAGE'    },
-            { SERVICE_NAME: 'BASEDEV', MNEMONIC_IMAGE_NAME: 'BASEDEV_IMAGE' },
-            { SERVICE_NAME: 'APP',     MNEMONIC_IMAGE_NAME: 'APP_IMAGE'     },
+            { SERVICE_NAME: 'BIRT',      MNEMONIC_IMAGE_NAME: 'BIRT_IMAGE'     },
+            { SERVICE_NAME: 'BASEDEV',   MNEMONIC_IMAGE_NAME: 'BASEDEV_IMAGE'  },
+            { SERVICE_NAME: 'APP',       MNEMONIC_IMAGE_NAME: 'APP_IMAGE'      },
+            { SERVICE_NAME: 'MONGO',     MNEMONIC_IMAGE_NAME: 'MONGO_IMAGE'    },
+            { SERVICE_NAME: 'ALGORITMO', MNEMONIC_IMAGE_NAME: 'ALGORITMO_IMAGE'},
         ];
         IMAGE_MNEMONICS.forEach( MNEMONIC_STRUCTURE => {
             const { SERVICE_NAME, MNEMONIC_IMAGE_NAME } = MNEMONIC_STRUCTURE;

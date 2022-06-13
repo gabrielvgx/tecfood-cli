@@ -43,6 +43,29 @@ services:
     networks:
       - dev_network
     restart: always
+  mongo:
+    image: <>MONGO_IMAGE<>
+    container_name: <>MONGO_CONTAINER_NAME<>
+    ports:
+      - "<>MONGO_EXT_PORT_27017<>:27017"
+    networks:
+      - dev_network
+  algoritmo:
+    image: <>ALGORITMO_IMAGE<>
+    container_name: <>ALGORITMO_CONTAINER_NAME<>
+    user: "node"
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+      - TZ=America/Sao_Paulo
+    volumes:
+      - <>ALGORITMO_BASEPATH<>:/home/node/app
+    ports:
+      - "<>ALGORITMO_EXT_PORT_9191<>:9191"
+    networks:
+      - dev_network
+    restart: always
+    command: "node --max-old-space-size=10000 server.js"
 networks:
   dev_network:
     name: dev_network

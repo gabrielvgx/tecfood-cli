@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { getAppRootPath } from '../util/app.js';
+import UtilApp from '../util/app.js';
 
 const cleanBuild = {
     hasAccess(file){
@@ -13,7 +13,7 @@ const cleanBuild = {
         }
     },
     execute(){
-        const APP_ROOT_PATH = getAppRootPath();
+        const APP_ROOT_PATH = UtilApp.getAppRootPath();
         const FILES_TO_REMOVE = [
             path.join(APP_ROOT_PATH, 'src/build/config/environment.json'),
             path.join(APP_ROOT_PATH, 'src/docker/credentials/config.json'),

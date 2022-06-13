@@ -1,8 +1,8 @@
-import ora from 'ora';
-import chalk from 'chalk';
+// import ora from 'ora';
+// import chalk from 'chalk';
+// import Listr from 'listr';
+// import prompts from 'prompts';
 import path from 'path';
-import Listr from 'listr';
-import prompts from 'prompts';
 
 import question from './src/questions/question.js';
 import app from './src/util/app.js';
@@ -14,6 +14,8 @@ question.executeQuestions().then( services => {
     if(app.hasAccess(dockerComposeFile)){
         docker.runServices( services );
     }
+}).catch( error => {
+    console.error(error.message);
 });
 // let time_start = Date.now();
 // const tasks = new Listr([

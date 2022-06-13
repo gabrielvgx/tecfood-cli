@@ -5,6 +5,8 @@ import { confirm, text, password } from './template_option.js';
 import birt from './modules/birt.js';
 import app from './modules/app.js';
 import basedev from './modules/basedev.js';
+import mongo from './modules/mongo.js';
+import algoritmo from './modules/algoritmo.js';
 import UtilApp from '../util/app.js';
 import docker from '../util/docker.js';
 
@@ -38,13 +40,17 @@ const question = {
                 choices: [
                     { title: 'Birt', value: 'BIRT' },
                     { title: 'Apps', value: 'APP'  },
-                    { title: 'PHP/Apache (based in cloud9)', value: 'BASEDEV', selected: true }
+                    { title: 'PHP/Apache (based in cloud9)', value: 'BASEDEV', selected: true },
+                    { title: 'Mongo 3.2', value: 'MONGO' },
+                    { title: 'Algoritmo - Otimizador', value: 'ALGORITMO' },
                 ],
                 min: 1,
                 hint: '- Space to select. Return to submit'
             },
             
         );
+        if(!environments.value) throw new Error("Configuração de ambiente cancelada.");
+        else console.log(environments);
         let optUseDefault = await prompts({
             type: 'select',
             name: 'value',
@@ -55,6 +61,7 @@ const question = {
             ],
             initial: 0
         });
+        if(typeof optUseDefault.value !== 'boolean') throw new Error("Configuração de ambiente cancelada.");
         return {
             environments: environments.value,
             useDefault: optUseDefault.value
@@ -64,7 +71,9 @@ const question = {
         let questions = [
             birt,
             app,
-            basedev
+            basedev,
+            mongo,
+            algoritmo
         ];
         let resolveP;
         const promise = new Promise( resolve => {
