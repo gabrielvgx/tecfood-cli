@@ -7,6 +7,7 @@ import path from 'path';
 import question from './src/questions/question.js';
 import app from './src/util/app.js';
 import docker from './src/util/docker.js';
+import emoji from 'node-emoji';
 
 question.executeQuestions().then( services => {
     const ROOT_PATH = app.getAppRootPath();
@@ -15,8 +16,9 @@ question.executeQuestions().then( services => {
         docker.runServices( services );
     }
 }).catch( error => {
-    console.error(error.message);
+    console.error(emoji.get('x'), error.message);
 });
+
 // let time_start = Date.now();
 // const tasks = new Listr([
 //     {
