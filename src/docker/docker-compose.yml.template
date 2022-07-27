@@ -14,7 +14,6 @@ services:
     tty: true
     volumes:
       - <>APP_BASE_PATH<>:/var/www
-      <>APP_SSHPATH_VOLUME<>
     networks:
       - dev_network
   birt:
