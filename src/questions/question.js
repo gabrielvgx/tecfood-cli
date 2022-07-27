@@ -50,7 +50,6 @@ const question = {
             
         );
         if(!environments.value) throw new Error("Configuração de ambiente cancelada.");
-        else console.log(environments);
         let optUseDefault = await prompts({
             type: 'select',
             name: 'value',
@@ -105,7 +104,7 @@ const question = {
             const SERVICES = ENV.SERVICES;
             let registry = new Set();
             environments.forEach( serviceName => {
-                if(SERVICES[serviceName]){
+                if(SERVICES[serviceName] || SERVICES[serviceName].IS_PRIVATE){
                     registry.add(SERVICES[serviceName].REGISTRY || '');
                 }
             });
