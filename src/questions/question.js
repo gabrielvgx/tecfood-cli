@@ -102,14 +102,15 @@ const question = {
             UtilApp.buildTemplateFiles();
             const ENV = UtilApp.getEnv(); //env.json
             const SERVICES = ENV.SERVICES;
-            let registry = new Set();
+            let registrySet = new Set();
             environments.forEach( serviceName => {
-                if(SERVICES[serviceName] || SERVICES[serviceName].IS_PRIVATE){
-                    registry.add(SERVICES[serviceName].REGISTRY || '');
+                let { IS_PRIVATE = false, REGISTRY = '' } = (SERVICES[serviceName] || {});
+                if(REGISTRY || IS_PRIVATE){
+                    registrySet.add(serviceConfig.REGISTRY || '');
                 }
             });
-            if( registry.size ) {
-                this.requestCredentialsDocker(Array.from(registry)).then(this.persistCredentialsDocker).then(_ => resolveP(environments));
+            if( registrySet.size ) {
+                this.requestCredentialsDocker(Array.from(registrySet)).then(this.persistCredentialsDocker).then(_ => resolveP(environments));
             } else {
                 resolveP(environments);
             }
