@@ -1,7 +1,7 @@
 import prompts from 'prompts';
 import { eachSeries } from 'async';
 
-import { confirm, text, password } from './template_option.js';
+import { text, password } from './template_option.js';
 import birt from './modules/birt.js';
 import app from './modules/app.js';
 import basedev from './modules/basedev.js';
@@ -32,10 +32,20 @@ const question = {
         });
     },
     async initialQuest(){
-        let environments = await prompts(
+        const { environments, useDefault, typeConfigure } = await prompts([
             {
-                type: 'multiselect',
-                name: 'value',
+                type: 'select',
+                name: 'typeConfigure',
+                message: 'Em que posso ajudar?',
+                choices: [
+                    { title: 'Ambientes', description: 'Configurar ambientes', value: 'ENV' },
+                    { title: 'APK',       description: 'Gerar APK - Cordova',  value: 'BUILD_APK' },
+                ],
+                initial: 0,
+            },
+            {
+                type: prev => prev === 'ENV' ? 'multiselect' : null,
+                name: 'environments',
                 message: 'Ambientes a serem configurados',
                 choices: [
                     { title: 'Birt', value: 'BIRT' },
@@ -45,25 +55,23 @@ const question = {
                     { title: 'Algoritmo - Otimizador', value: 'ALGORITMO' },
                 ],
                 min: 1,
-                hint: '- Space to select. Return to submit'
+                hint: '- <Space> to select. <Enter> to submit'
             },
-            
-        );
-        if(!environments.value) throw new Error("Configuração de ambiente cancelada.");
-        let optUseDefault = await prompts({
-            type: 'select',
-            name: 'value',
-            message: 'Modo de instalação',
-            choices: [
-                { title: 'Padrão', description: 'Configuração automatizada (modo silencioso)', value: true },
-                { title: 'Avançado', description: 'Configuração detalhada com interações com usuário recorrentes', value: false, },
-            ],
-            initial: 0
-        });
-        if(typeof optUseDefault.value !== 'boolean') throw new Error("Configuração de ambiente cancelada.");
+            {
+                type: prev => !!prev ? 'select' : 'null',
+                name: 'useDefault',
+                message: 'Modo de configuração',
+                choices: [
+                    { title: 'Padrão', description: 'Configuração automatizada (modo silencioso)', value: true },
+                    { title: 'Avançado', description: 'Configuração detalhada com interações com usuário recorrentes', value: false, },
+                ],
+                initial: 0
+            }
+        ]);
+        if(!typeConfigure || (!environments && !typeConfigure == 'ENV') || !useDefault) throw new Error("Configuração cancelada.");
         return {
-            environments: environments.value,
-            useDefault: optUseDefault.value
+            environments: environments ? environments : typeConfigure,
+            useDefault,
         };
     },
     async executeQuestions(){
@@ -106,7 +114,7 @@ const question = {
             environments.forEach( serviceName => {
                 let { IS_PRIVATE = false, REGISTRY = '' } = (SERVICES[serviceName] || {});
                 if(REGISTRY || IS_PRIVATE){
-                    registrySet.add(serviceConfig.REGISTRY || '');
+                    registrySet.add(REGISTRY || '');
                 }
             });
             if( registrySet.size ) {

@@ -10,7 +10,7 @@ const templateOption = {
             initial: defaultValue
         };
         if( onlyOptions ) {
-            return options;
+            return Promise.resolve(options);
         }
         return await prompts(options);
     },

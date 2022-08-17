@@ -5,6 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "release": "pkg .",
     "build": "node src/build/buildTemplate.js",
     "cleanBuild": "node src/build/cleanBuild.js",
     "start": "node src/build/cleanBuild.js && node index.js",
@@ -19,5 +20,18 @@
     "node-emoji": "^1.11.0",
     "ora": "^6.0.1",
     "prompts": "^2.4.2"
+  },
+  "bin": "lib/index.js",
+  "pkg": {
+    "targets": [
+      "node16"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.18.10",
+    "@babel/preset-env": "^7.18.10",
+    "@vercel/ncc": "^0.34.0",
+    "pkg": "^5.8.0"
   }
 }

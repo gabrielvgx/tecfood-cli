@@ -25,7 +25,7 @@ curl -s "https://get.sdkman.io" | bash
 source "/root/.sdkman/bin/sdkman-init.sh"
 sdk install gradle
 yes | sdkmanager --install "platforms;android-27"
-sdkmanager  --install "build-tools;29.0.0"
+yes | sdkmanager --install "build-tools;29.0.0"
 
 apt-get remove -y curl wget unzip zip 
 apt-get clean

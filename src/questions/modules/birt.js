@@ -1,4 +1,4 @@
-import { confirm, text } from '../template_option.js';
+import { text } from '../template_option.js';
 import os from 'os';
 import path from 'path';
 
