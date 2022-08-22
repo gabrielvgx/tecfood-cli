@@ -1,0 +1,69 @@
+{
+    "version": "3",
+    "services": {
+        "app": {
+            "image": "gvgx/cordova-app-tecfood:latest",
+            "container_name": "app-container",
+            "build": "./build/app",
+            "working_dir": "/var/www",
+            "restart": "always",
+            "tty": true,
+            "volumes": [],
+            "networks": [
+                "dev_network"
+            ]
+        },
+        "birt": {
+            "image": "dockerhub.teknisa.com/birt:latest",
+            "container_name": "birt",
+            "environment": [],
+            "volumes": [],
+            "ports": [],
+            "networks": [
+                "dev_network"
+            ],
+            "restart": "always"
+        },
+        "basedev": {
+            "image": "dockerhub.teknisa.com/c9-php7:latest",
+            "container_name": "basedev-container",
+            "volumes": [],
+            "ports": [],
+            "networks": [
+                "dev_network"
+            ],
+            "restart": "always"
+        },
+        "mongo": {
+            "image": "mongo:3.2",
+            "container_name": "mongo-container",
+            "ports": [],
+            "networks": [
+                "dev_network"
+            ]
+        },
+        "algoritmo": {
+            "image": "node:10",
+            "container_name": "algoritmo-container",
+            "user": "node",
+            "working_dir": "/home/node/app",
+            "environment": [
+                "NODE_ENV=production",
+                "TZ=America/Sao_Paulo"
+            ],
+            "volumes": [],
+            "ports": [],
+            "networks": [
+                "dev_network"
+            ],
+            "restart": "always",
+            "command": "node --max-old-space-size=10000 server.js"
+        }
+    },
+    "networks": {
+        "dev_network": {
+            "name": "dev_network",
+            "driver": "bridge"
+        }
+    }
+}

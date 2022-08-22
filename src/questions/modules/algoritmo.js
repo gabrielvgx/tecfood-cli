@@ -3,7 +3,7 @@ import os from 'os';
 import path from 'path';
 
 const algoritmo = {
-    name: 'ALGORITMO',
+    name: 'algoritmo',
     async execute(){
         const { value: ALGORITMO_BASEPATH       } = await text("Caminho base (mapeado para /home/node/app)", path.join(os.homedir(), 'workfolder', 'algoritmo'));
         const { value: ALGORITMO_CONTAINER_NAME } = await text("Container name", 'algoritmo-container');

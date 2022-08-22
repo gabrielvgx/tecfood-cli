@@ -2,13 +2,9 @@ import prompts from 'prompts';
 import { eachSeries } from 'async';
 
 import { text, password } from './template_option.js';
-import birt from './modules/birt.js';
-import app from './modules/app.js';
-import basedev from './modules/basedev.js';
-import mongo from './modules/mongo.js';
-import algoritmo from './modules/algoritmo.js';
 import UtilApp from '../util/app.js';
 import docker from '../util/docker.js';
+import { getAllQuestions } from './modules/all_questions.js';
 
 const question = {
     async requestCredentialsDocker( allRegistry ){
@@ -26,7 +22,7 @@ const question = {
     async persistCredentialsDocker( credentials ){
         return eachSeries(Object.keys(credentials), function( REGISTRY, callback) {
             const { USER, PASSWORD } = credentials[REGISTRY]; 
-            return docker.registerCredentials(USER, PASSWORD, REGISTRY).then(function(){
+            docker.registerCredentials(USER, PASSWORD, REGISTRY).then(function(){
                 callback();
             });
         });
@@ -39,20 +35,21 @@ const question = {
                 message: 'Em que posso ajudar?',
                 choices: [
                     { title: 'Ambientes', description: 'Configurar ambientes', value: 'ENV' },
-                    { title: 'APK',       description: 'Gerar APK - Cordova',  value: 'BUILD_APK' },
+                    { title: 'APK',       description: 'Gerar APK - Cordova',  value: 'build_apk' },
                 ],
                 initial: 0,
+                hint: '- Use "arrow-up" "arrow-down" to navigate. <Enter> to submit'
             },
             {
                 type: prev => prev === 'ENV' ? 'multiselect' : null,
                 name: 'environments',
                 message: 'Ambientes a serem configurados',
                 choices: [
-                    { title: 'Birt', value: 'BIRT' },
-                    { title: 'Apps', value: 'APP'  },
-                    { title: 'PHP/Apache (based in cloud9)', value: 'BASEDEV', selected: true },
-                    { title: 'Mongo 3.2', value: 'MONGO' },
-                    { title: 'Algoritmo - Otimizador', value: 'ALGORITMO' },
+                    { title: 'Birt', value: 'birt' },
+                    { title: 'Apps', value: 'app'  },
+                    { title: 'PHP/Apache (based in cloud9)', value: 'basedev', selected: true },
+                    { title: 'Mongo 3.2', value: 'mongo' },
+                    { title: 'Algoritmo - Otimizador', value: 'algoritmo' },
                 ],
                 min: 1,
                 hint: '- <Space> to select. <Enter> to submit'
@@ -68,62 +65,69 @@ const question = {
                 initial: 0
             }
         ]);
-        if(!typeConfigure || (!environments && !typeConfigure == 'ENV') || !useDefault) throw new Error("Configuração cancelada.");
+        if(!typeConfigure || (!environments && !typeConfigure == 'ENV') || typeof useDefault !== 'boolean') throw new Error("Configuração cancelada.");
         return {
             environments: environments ? environments : typeConfigure,
             useDefault,
         };
     },
-    async executeQuestions(){
-        let questions = [
-            birt,
-            app,
-            basedev,
-            mongo,
-            algoritmo
-        ];
-        let resolveP;
-        const promise = new Promise( resolve => {
-            resolveP = resolve;
+    removeBuildParams( envParams ){
+        let copyEnv = JSON.parse(JSON.stringify(envParams));
+        Object.keys(copyEnv.services).forEach( serviceName => {
+            delete copyEnv.services[serviceName].buildParams;
         });
-        const { environments, useDefault } = await this.initialQuest();
-        let promiseQuestions = Promise.resolve(null);
-        if( useDefault ){
-            UtilApp.generateEnvFile();
-        } else {
-            let responseQuestions = {};
-            promiseQuestions = eachSeries(questions, function ( question, callback ) {
-                if(environments.includes(question.name)){
-                    question.execute().then( response => {
-                        Object.assign(responseQuestions, response);
+        return copyEnv;
+    },
+    async executeQuestions(){
+        let questions = getAllQuestions();
+        return new Promise( async resolve => {
+
+            const { environments, useDefault } = await this.initialQuest();
+            let promiseQuestions = Promise.resolve(null);
+            let defaultEnv = UtilApp.getEnv();
+            if( !useDefault ){
+                let responseQuestions = {};
+                promiseQuestions = eachSeries([questions[0]], function ( question, callback ) {
+                    if(environments.includes(question.name)){
+                        question.execute().then( response => {
+                            Object.assign(responseQuestions, response);
+                            callback();
+                        });
+                    } else if(question.name == 'generic'){
+                        eachSeries(environments, function( serviceName, endCurIterate ) {
+                            question.execute(defaultEnv.services[serviceName].volumes).then( volumes => {
+                                defaultEnv.services[serviceName].volumes = volumes;
+                                endCurIterate();
+                            });
+                        }).then( _ => callback() );
+                    } else {
                         callback();
-                    });
-                } else {
-                    callback();
-                }
-            }).then( _ => responseQuestions);
-        }
-        promiseQuestions.then( function( responseQuestions ) {
-            if(responseQuestions){
-                UtilApp.generateEnvFile(responseQuestions);
+                    }
+                }).then( _ => responseQuestions);
             }
-            UtilApp.buildTemplateFiles();
-            const ENV = UtilApp.getEnv(); //env.json
-            const SERVICES = ENV.SERVICES;
-            let registrySet = new Set();
-            environments.forEach( serviceName => {
-                let { IS_PRIVATE = false, REGISTRY = '' } = (SERVICES[serviceName] || {});
-                if(REGISTRY || IS_PRIVATE){
-                    registrySet.add(REGISTRY || '');
+            await promiseQuestions;
+            // if(responseQuestions){
+                // UtilApp.generateEnvFile(defaultEnv);
+            // }
+            defaultEnv  = this.removeBuildParams(defaultEnv);
+            UtilApp.generateComposeFile(defaultEnv);
+            let env = UtilApp.getEnv();
+            // let nameServices = Object.keys(env.services);
+            const REGISTRY_SET = environments.reduce( (setStructure, serviceName) => {
+                let { buildParams: { private: isPrivateRegistry }, image = '' } = (env.services[serviceName] || {});
+                if( isPrivateRegistry ){
+                    setStructure.add(docker.getRegistryByImage(image) || '');
                 }
-            });
-            if( registrySet.size ) {
-                this.requestCredentialsDocker(Array.from(registrySet)).then(this.persistCredentialsDocker).then(_ => resolveP(environments));
+                return setStructure;
+            }, new Set());
+            if( REGISTRY_SET.size ) {
+                this.requestCredentialsDocker(Array.from(REGISTRY_SET)).then(
+                    this.persistCredentialsDocker
+                ).then(_ => resolve(environments));
             } else {
-                resolveP(environments);
+                resolve(environments);
             }
-        }.bind(this));
-        return promise;
+        });
     }
 }
 

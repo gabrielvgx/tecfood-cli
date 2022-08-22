@@ -5,6 +5,11 @@ import { getAppRootPath, getPathConfigFolderDocker } from './app.js';
 import terminal from './terminal.js';
 
 const docker = {
+    getRegistryByImage( imageStr ){
+        if( !imageStr || typeof imageStr !== 'string') imageStr = '';
+        let {groups: {registry = ''}} = (imageStr.match(/(?<registry>[\w\-\.]+)/i) || {groups: {}});
+        return registry;
+    },
     async registerCredentials(USER, PASSWORD, REGISTRY = "", pathSaveCredential = null){
         const PATH_SAVE_CREDENTIAL = pathSaveCredential || getPathConfigFolderDocker();
         const ARGS = `"${REGISTRY}" "${USER}" "${PASSWORD}" "${PATH_SAVE_CREDENTIAL}"`;

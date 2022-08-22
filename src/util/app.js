@@ -1,9 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
-
-import mnemonic from './mnemonic.js';
-
+import { json2yml } from '../util/fileParser.js';
 const app = {
     hasAccess(path){
         try {
@@ -22,59 +20,42 @@ const app = {
     },
     getEnvFilePath(){
         const APP_ROOT_PATH = this.getAppRootPath();
-        const PATH_ENV = path.join(APP_ROOT_PATH, 'src', 'build', 'config', 'environment.json');
+        const PATH_ENV = path.join(APP_ROOT_PATH, 'src', 'docker', '.docker-compose.json');
+        return PATH_ENV;
+    },
+    getComposeFilePath(){
+        const APP_ROOT_PATH = this.getAppRootPath();
+        const PATH_ENV = path.join(APP_ROOT_PATH, 'src', 'docker', 'docker-compose.yml');
         return PATH_ENV;
     },
     getEnv(){
-        const APP_ROOT_PATH = this.getAppRootPath();
         const PATH_ENV = this.getEnvFilePath();
-        const ENV = JSON.parse(fs.readFileSync(PATH_ENV, 'utf-8'));
+        const ENV = JSON.parse(fs.readFileSync(PATH_ENV, 'utf8'));
         return ENV;
     },
-    buildTemplateFiles(){
-        const PATH_ENV = this.getEnvFilePath();
-        if(!this.hasAccess(PATH_ENV)){
-            this.generateEnvFile();
-        }
-        const ENV = JSON.parse(fs.readFileSync(PATH_ENV, 'utf-8'));
-        const removeCommentYml = stringYml => stringYml.replace(/#.+/gi, '');
-        const removeEmptySpaceStartLine = string => string.replace(/^\s+$/gim, '');
-        const removeBreakLineInStartLine = string => string.replace(/^\n/gim, '');
-        const replaceString = ( originalString ) => {
-            let str = originalString;
-            str = removeCommentYml(str);
-            str = removeEmptySpaceStartLine(str);
-            str = removeBreakLineInStartLine(str);
-            return str;
-        };
-        const FILES = [
-            {
-                filePath: path.join(this.getAppRootPath(), 'src', 'docker', 'docker-compose.yml.template'),
-                onBeforeWrite: replaceString
+    mergeEnv(defaultEnv, {services}) {
+        let copyDefaultEnv = JSON.parse(JSON.stringify(defaultEnv));
+        let serviceNames = Object.keys(copyDefaultEnv.services);
+        
+        serviceNames.forEach( serviceName => {
+            if(serviceName in services) {
+                copyDefaultEnv.services[serviceName] = Object.assign(copyDefaultEnv.services[serviceName], services[serviceName]);
             }
-        ];
-        const replaceMnemonics = configFile => {
-            const { filePath, onBeforeWrite = null } = configFile;
-            mnemonic.replaceFromMap(filePath, ENV, { onBeforeWrite });
-        };
-        FILES.forEach( replaceMnemonics );
+        });
+        return copyDefaultEnv;
     },
-    generateEnvFile( sourceObject = {} ){
+    generateEnvFile( sourceObject = { services: {} } ){
         const ROOT_PATH = this.getAppRootPath();
-        const ENV_PATH = path.join(ROOT_PATH, 'src', 'build', 'config');
-        if(this.hasAccess(ENV_PATH) && !this.hasAccess(path.join(ENV_PATH, 'environment.json'))){ // has access path and file not exists
-            const HOME_PATH = os.homedir();
-            let defaultEnvContent = JSON.stringify(JSON.parse(fs.readFileSync(path.join(ENV_PATH, 'env-default.json'), 'utf-8')), null, 4);
+        const ENV_PATH = path.join(ROOT_PATH, 'src', 'docker');
+        const DEFAULT_CONFIG_FILE = path.join(ENV_PATH, 'docker-compose.json');
+        if( this.hasAccess(DEFAULT_CONFIG_FILE) ){ // has access path and file not exists
+            let defaultEnvContent = JSON.parse(fs.readFileSync(DEFAULT_CONFIG_FILE, 'utf8'));
             defaultEnvContent = JSON.stringify(
-                Object.assign(
-                    JSON.parse(defaultEnvContent), 
-                    sourceObject
-                ),
+                this.mergeEnv(defaultEnvContent, sourceObject),
                 null,
                 4
             );
-            defaultEnvContent = mnemonic.replaceMnemonic(defaultEnvContent, 'HOME_PATH', HOME_PATH);
-            const ENV_FILE_PATH = path.join(ENV_PATH, 'environment.json'); 
+            const ENV_FILE_PATH = path.join(ENV_PATH, '.docker-compose.json'); 
             fs.writeFileSync(ENV_FILE_PATH, defaultEnvContent);
             return JSON.parse(defaultEnvContent);
         } else {
@@ -83,6 +64,9 @@ const app = {
     },
     getPathConfigFolderDocker(){
         return path.join(os.homedir(), '.docker');
+    },
+    generateComposeFile( sourceObject ){
+        json2yml(sourceObject, false, this.getComposeFilePath());
     }
 }
 

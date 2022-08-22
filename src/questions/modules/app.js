@@ -1,7 +1,7 @@
 import { confirm, text } from '../template_option.js';
 
 const app = {
-    name: 'APP',
+    name: 'app',
     async execute(){
 
     }

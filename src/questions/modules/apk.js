@@ -1,7 +1,5 @@
-import { confirm, text } from '../template_option.js';
-
 const apk = {
-    name: 'BUILD_APK',
+    name: 'build_apk',
     async execute(){
         
         const { value: SSH_PATH } = await prompts([

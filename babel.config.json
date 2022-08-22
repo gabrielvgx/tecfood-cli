@@ -1,4 +1,0 @@
-{
-    "presets": ["@babel/preset-env"],
-    "include": ["src"]
-}

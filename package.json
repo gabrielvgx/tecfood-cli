@@ -5,33 +5,25 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "release": "pkg .",
     "build": "node src/build/buildTemplate.js",
     "cleanBuild": "node src/build/cleanBuild.js",
     "start": "node src/build/cleanBuild.js && node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "debug": "node src/build/cleanBuild.js && node --inspect index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "yml": "node src/tests/yml.js"
   },
   "author": "Gabriel Xavier",
   "license": "ISC",
   "dependencies": {
     "async": "^3.2.3",
-    "chalk": "^5.0.0",
+    "get-port": "^6.1.2",
     "listr": "^0.14.2",
     "node-emoji": "^1.11.0",
     "ora": "^6.0.1",
     "prompts": "^2.4.2"
   },
-  "bin": "lib/index.js",
-  "pkg": {
-    "targets": [
-      "node16"
-    ]
-  },
+  "bin": "index.js",
   "devDependencies": {
-    "@babel/cli": "^7.18.10",
-    "@babel/core": "^7.18.10",
-    "@babel/preset-env": "^7.18.10",
-    "@vercel/ncc": "^0.34.0",
-    "pkg": "^5.8.0"
+    "js-yaml": "^4.1.0"
   }
 }
