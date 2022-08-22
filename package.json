@@ -23,7 +23,7 @@
     "prompts": "^2.4.2"
   },
   "bin": {
-      "tecfoodcli": "./index.js"
+      "tecfoodcli": "./bin/cli.js"
   },
   "devDependencies": {
     "js-yaml": "^4.1.0"
