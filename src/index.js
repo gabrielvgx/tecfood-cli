@@ -5,9 +5,9 @@
 import path from 'path';
 import os from 'os';
 
-import question from './src/questions/question.js';
-import app from './src/util/app.js';
-import docker from './src/util/docker.js';
+import question from './questions/question.js';
+import app from './util/app.js';
+import docker from './util/docker.js';
 import emoji from 'node-emoji';
 function build(){
     const HOME_PATH = os.homedir();

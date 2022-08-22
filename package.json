@@ -7,8 +7,8 @@
   "scripts": {
     "build": "node src/build/buildTemplate.js",
     "cleanBuild": "node src/build/cleanBuild.js",
-    "start": "clear && node src/build/cleanBuild.js && node index.js",
-    "debug": "node src/build/cleanBuild.js && node --inspect index.js",
+    "start": "clear && node src/build/cleanBuild.js && node ./src/index.js",
+    "debug": "node src/build/cleanBuild.js && node --inspect ./src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "yml": "node src/tests/yml.js"
   },
