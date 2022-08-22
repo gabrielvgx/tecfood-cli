@@ -95,8 +95,9 @@ const question = {
                         });
                     } else if(question.name == 'generic'){
                         eachSeries(environments, function( serviceName, endCurIterate ) {
-                            question.execute(defaultEnv.services[serviceName].volumes).then( volumes => {
+                            question.execute(defaultEnv.services[serviceName]).then( ({volumes, ports}) => {
                                 defaultEnv.services[serviceName].volumes = volumes;
+                                defaultEnv.services[serviceName].ports = ports;
                                 endCurIterate();
                             });
                         }).then( _ => callback() );

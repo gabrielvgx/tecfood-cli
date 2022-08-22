@@ -4,30 +4,25 @@ import { text } from '../template_option.js';
 
 const genericQuestions = {
     name: "generic",
-    async execute( volumes ){
+    async crudListItem( listItems, titleQuestion, messageAddItem, chrSeparator = ':'){
         const STYLE = '\n\t';
-        const hint = STYLE.concat(volumes.join(STYLE));
+        const hint = STYLE.concat(listItems.join(STYLE));
         const CANCEL_OPTION = {
             title: "Cancelar",
             value: "CANCEL"
         };
-        let choices = volumes.map( volume => ({title: volume, value: volume}))
+        let choices = listItems.map( item => ({title: item, value: item}))
                              .concat(CANCEL_OPTION);
-        // let configVolume =  volumes.reduce( ( configVolume, volume ) => {
-        //     let [ host, docker ] = volume.split(':');
-        //     configVolume[host] = docker;
-        //     return configVolume;
-        // }, {});
 
-        const getVolume = async (host, docker) => {
-            return await text(docker, host);
+        const execQuestionGetItem = async (hostValue, dockerValue) => {
+            return await text(`Docker: ${dockerValue} - Host:`, hostValue);
         };
 
-        const volumesQuestion = [
+        const initialQuestion = [
             {
                 type: 'select',
-                name: "volumeOperation",
-                message: "Volumes",
+                name: "operation",
+                message: titleQuestion,
                 hint,
                 choices: [
                     { title: "Adicionar", value: "ADD" },
@@ -35,47 +30,66 @@ const genericQuestions = {
                     { title: "Excluir", value: "DELETE"},
                     { title: "Confirmar", value: "CONFIRM"},
                     { title: "Cancelar", value: "CANCEL"},
-                ]
+                ],
+                initial: 3
             }, 
             {
                 type: prev => [ 'EDIT', 'DELETE' ].includes(prev) ? 'select': null,
-                name: "volumeSelection",
-                message: "Volume",
+                name: "itemSelection",
+                message: titleQuestion,
                 choices
             }
             
         ];
-        const { volumeOperation, volumeSelection } = await prompts(volumesQuestion);
-        if ( ['CANCEL', 'CONFIRM'].includes(volumeOperation) ) {
-            return volumes;
-        } else {
-            let docker = '';
-            let host = '';
-            let indexOldVolume = -1;
-            let newVolumes = [...volumes];
-            if ( ['EDIT', 'DELETE'].includes(volumeOperation) ) {
-                let paths = volumeSelection.split(':');
-                host = paths[0];
-                docker = paths[1];
-                indexOldVolume = volumes.findIndex( volume => volume === `${host}:${docker}`);
+        const { operation, itemSelection } = await prompts( initialQuestion );
+        if ( ['CANCEL', 'CONFIRM'].includes(operation) ) {
+            return operation == 'CANCEL' ? null : listItems;
+        } else if(operation){
+            let dockerValue = '';
+            let hostValue = '';
+            let indexOldItem = -1;
+            let newListItems = [...listItems];
+            if ( ['EDIT', 'DELETE'].includes(operation) ) {
+                let [ host, docker ] = itemSelection.split(':');
+                dockerValue = docker;
+                hostValue = host;
+                indexOldItem = listItems.findIndex( item => item === `${host}${chrSeparator}${docker}`);
             }
-            switch( volumeOperation ) {
+            switch( operation ) {
                 case 'ADD': 
-                    let { value: NEW_VOLUME } = await text("Volume (/path/host:/path/docker)");
-                    newVolumes.push( NEW_VOLUME );
+                    let { value: NEW_ITEM } = await text(messageAddItem);
+                    newListItems.push( NEW_ITEM );
                     break;
                 case 'EDIT': 
-                    let { value: NEW_HOST } = await getVolume(host, docker);
-                    newVolumes[indexOldVolume] = `${NEW_HOST}:${docker}`;
+                    let { value: NEW_HOST } = await execQuestionGetItem(hostValue, dockerValue);
+                    newListItems[indexOldItem] = `${NEW_HOST}:${dockerValue}`;
                     break;
                 case 'DELETE': 
-                    newVolumes.splice(indexOldVolume, 1);
+                    newListItems.splice(indexOldItem, 1);
                     break;
                 default: 
                     break;
             }
-            return await this.execute(newVolumes);
+            return await this.crudListItem(newListItems, titleQuestion, messageAddItem, chrSeparator);
+        } else {
+            return null;
         }
+    },
+    async execute( config ){
+        const {
+            volumes,
+            ports,
+            container_name
+        } = config;
+        let newVolumes = await this.crudListItem(volumes, `Volume (${container_name})`, '/path/host:/path/docker');
+        if(!newVolumes) {
+            console.log('cancelVolumes', volumes);
+            newVolumes = volumes;
+        }
+        let newPorts = await this.crudListItem(ports, `Porta (${container_name})`, 'PORTA_HOST:PORTA_DOCKER');
+        if(!newPorts) newPorts = ports;
+        let copyConfig = JSON.parse(JSON.stringify(config));
+        return Object.assign(copyConfig, {volumes: newVolumes, ports: newPorts});
     }
 }
 const {
