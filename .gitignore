@@ -5,3 +5,5 @@ src/docker/docker-compose.yml
 src/docker/credentials/config.json
 
 src/build/config/environment.json 
+
+.vscode

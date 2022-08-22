@@ -1,0 +1,90 @@
+{
+    "version": "3",
+    "services": {
+        "app": {
+            "image": "gvgx/cordova-app-tecfood:latest",
+            "container_name": "app-container",
+            "build": "./build/app",
+            "working_dir": "/var/www",
+            "restart": "always",
+            "tty": true,
+            "networks": [
+                "dev_network"
+            ],
+            "volumes": [
+                "/home/gabrielvgx/workfolder:/var/www"
+            ]
+        },
+        "birt": {
+            "buildParams": {
+                "private": true
+            },
+            "image": "dockerhub.teknisa.com/birt:latest",
+            "container_name": "birt",
+            "networks": [
+                "dev_network"
+            ],
+            "restart": "always",
+            "environment": [
+                "http_proxy=http://192.168.122.121:3128",
+                "https_proxy=http://192.168.122.121:3128"
+            ],
+            "volumes": [
+                "/home/gabrielvgx/workfolder:/var/www"
+            ],
+            "ports": [
+                "9191:9191"
+            ]
+        },
+        "basedev": {
+            "buildParams": {
+                "private": true
+            },
+            "image": "dockerhub.teknisa.com/c9-php7:latest",
+            "container_name": "basedev-container",
+            "networks": [
+                "dev_network"
+            ],
+            "restart": "always",
+            "volumes": [
+                "/home/gabrielvgx/workfolder:/home/developer/workfolder"
+            ],
+            "ports": [
+                "3000:80"
+            ]
+        },
+        "mongo": {
+            "image": "mongo:3.2",
+            "container_name": "mongo-container",
+            "networks": [
+                "dev_network"
+            ],
+            "ports": [
+                "27017:27017"
+            ]
+        },
+        "algoritmo": {
+            "image": "node:10",
+            "container_name": "algoritmo-container",
+            "user": "node",
+            "working_dir": "/home/node/app",
+            "environment": [
+                "NODE_ENV=production",
+                "TZ=America/Sao_Paulo"
+            ],
+            "volumes": [],
+            "ports": [],
+            "networks": [
+                "dev_network"
+            ],
+            "restart": "always",
+            "command": "node --max-old-space-size=10000 server.js"
+        }
+    },
+    "networks": {
+        "dev_network": {
+            "name": "dev_network",
+            "driver": "bridge"
+        }
+    }
+}
