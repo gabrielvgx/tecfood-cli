@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "node src/build/buildTemplate.js",
     "cleanBuild": "node src/build/cleanBuild.js",
