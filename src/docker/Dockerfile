@@ -1,13 +1,19 @@
 FROM debian:stretch-slim
 
-WORKDIR /root/workfolder
+SHELL [ "/bin/bash", "-l", "-c" ]
 
-SHELL ["/bin/bash", "-c"]
+ARG HOME_DIR=/home/developer
+ARG DEFAULT_BUILD_TOOLS_VERSION="29.0.0"
+ARG DEFAULT_PLATFORM_ANDROID_VERSION="27"
+ARG WORKFOLDER=${HOME_DIR}/workfolder
 
-ENV ANDROID_SDK_ROOT=/root/android
-ENV ANDROID_HOME=/root/android
-ENV PATH=$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin
+COPY ./configure_user.sh ${WORKFOLDER}/configure_user.sh
+COPY ./install_dependency.sh ${WORKFOLDER}/install_dependency.sh
 
-COPY ./install_dependency.sh /root/workfolder
+RUN chmod +x ${WORKFOLDER}/configure_user.sh && chmod +x ${WORKFOLDER}/install_dependency.sh && ${WORKFOLDER}/configure_user.sh &&\
+    chown developer:developer ${WORKFOLDER}/install_dependency.sh
+USER developer
 
-RUN cd /root/workfolder && chmod +x install_dependency.sh && ./install_dependency.sh && groupadd -r developer && useradd -r -g developer developer
+RUN ${WORKFOLDER}/install_dependency.sh
+
+WORKDIR ${HOME_DIR}

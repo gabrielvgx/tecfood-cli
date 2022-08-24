@@ -1,17 +1,28 @@
 #!/bin/bash
 
 function install_required_deps {
-    apt-get update && apt-get install -y --no-install-recommends \
+    sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
         wget \
         zip \
         unzip \
-        rsync \
         default-jdk \
-        curl \
         openssh-client \
         git-all
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-    nvm install --lts
+}
+
+function configure_nvm {
+    export NVM_DIR="$HOME/.nvm" && (
+        git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+        cd "$NVM_DIR"
+        git checkout `git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1)`
+    ) && \. "$NVM_DIR/nvm.sh"
+
+    echo -e "export NVM_DIR=\"$HOME/.nvm\" \n [ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\" \n [ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\" " \
+        >> /home/developer/.bashrc
+    source /home/developer/.bashrc
+    nvm install --lts 
     npm install -g tecfood-apkgen cordova bower
 }
 
@@ -22,28 +33,60 @@ function custom_bash {
 }
  
 function install_deps_android {
-    cd ~  
+    DEFAULT_TOOLS_LINK="https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip"
+    DOWNLOAD_PAGE="https://developer.android.com/studio\#downloads"
+    PREFIX_MATCH_TOOLS="https://dl.google.com/android/repository/commandlinetools-linux-"
+
+    cd $HOME
     mkdir -p android/cmdline-tools 
-    wget -O sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip
-    unzip sdk-tools.zip && mv cmdline-tools ~/android/cmdline-tools/tools
-    rm -rf sdk-tools.zip
-    curl -s "https://get.sdkman.io" | bash 
-    source "/root/.sdkman/bin/sdkman-init.sh"
-    sdk install gradle
-    yes | sdkmanager --install "build-tools;29.0.0"
-    yes | sdkmanager --install "platforms;android-27"
+    {
+        LATEST_TOOLS=$(curl $DOWNLOAD_PAGE | grep -i $PREFIX_MATCH_TOOLS | grep -Eo 'https://[^ >"]+')
+        wget -O sdk-tools.zip $LATEST_TOOLS
+    } || {
+        wget -O sdk-tools.zip $DEFAULT_TOOLS_LINK
+    }
+    ls -lha
+    if [ -f ./sdk-tools.zip ]; then
+        unzip sdk-tools.zip && mv cmdline-tools $HOME/android/cmdline-tools/tools
+        curl -s "https://get.sdkman.io" | bash 
+        source "/home/developer/.sdkman/bin/sdkman-init.sh"
+        sdk install gradle
+        
+        export ANDROID_SDK_ROOT=$HOME/android
+        export ANDROID_HOME=$ANDROID_SDK_ROOT
+        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
+        
+        # GET LAST VERSION build-tools
+        # BUILD_TOOLS_VERSION=$(sdkmanager --list | grep -i 'build-tools;' | tail -1 | grep -Eo '[^ ]+' | head -1)
+        
+        printf '%s\n' \
+                "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" \
+                "export ANDROID_HOME=$ANDROID_HOME" \
+                "export PATH=$PATH" \
+                >> $HOME/.bashrc
+        source $HOME/.bashrc
+        # if [ -z $BUILD_TOOLS_VERSION ]; then
+        #     BUILD_TOOLS_VERSION=$DEFAULT_BUILD_TOOLS_VERSION
+        # fi
+        yes | sdkmanager --install "build-tools;$DEFAULT_BUILD_TOOLS_VERSION"
+        yes | sdkmanager --install "platforms;android-$DEFAULT_PLATFORM_ANDROID_VERSION"
+    else
+        echo 'Error install android_deps'
+        exit 1
+    fi
 }
 
 function clean {
-    apt-get remove -y curl wget unzip zip 
-    apt-get clean
-    apt-get autoclean
-    apt-get autoremove
-    rm -rf /var/lib/apt/lists/*
+    sudo apt-get remove -y curl wget unzip zip 
+    sudo apt-get clean -y
+    sudo apt-get autoclean -y
+    sudo apt-get autoremove -y
+    sudo rm -rf /var/lib/apt/lists/*
+    sudo rm -rf ~/sdk-tools.zip
 }
 
 {
-    install_required_deps && custom_bash && install_deps_android && clean
+    install_required_deps && configure_nvm && install_deps_android && custom_bash && clean
 } || {
     echo 'Error install deps'
     exit 1

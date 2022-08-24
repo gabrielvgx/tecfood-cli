@@ -1,4 +1,5 @@
 node_modules
+lib/
 
 # generated config files
 src/docker/docker-compose.yml
