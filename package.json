@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Projeto para automatizar criação de ambientes TecFood",
   "main": "./lib/bin/tecfoodcli.js",
+  "type": "module",
   "bin": {
     "tecfoodcli": "./lib/bin/tecfoodcli.js"
   },

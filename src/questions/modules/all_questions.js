@@ -1,10 +1,6 @@
 import genericQuestions from './genericQuestions.js';
-import algoritmo from './algoritmo.js';
 import app from './app.js';
 import apk from './apk.js';
-import basedev from './basedev.js';
-import birt from './birt.js';
-import mongo from './mongo.js';
 
 const all_questions = {
     getAllQuestions(){
@@ -12,10 +8,6 @@ const all_questions = {
             genericQuestions,
             app,
             apk,
-            algoritmo,
-            basedev,
-            birt,
-            mongo
         ]
     }
 }

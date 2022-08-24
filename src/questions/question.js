@@ -78,6 +78,19 @@ const question = {
         });
         return copyEnv;
     },
+    removeUnselectedServices(env, selectedServices){
+        
+        let initialEnv = JSON.stringify(env);
+        let modifiedEnv = initialEnv;
+        initialEnv = JSON.parse(initialEnv);
+        modifiedEnv = JSON.parse(modifiedEnv);
+        Object.keys(initialEnv.services).forEach( serviceName => {
+            if(!selectedServices.includes(serviceName)) {
+                delete modifiedEnv.services[serviceName];
+            }
+        });
+        return modifiedEnv;
+    },
     async executeQuestions(){
         let questions = getAllQuestions();
         return new Promise( async resolve => {
@@ -95,9 +108,10 @@ const question = {
                         });
                     } else if(question.name == 'generic'){
                         eachSeries(environments, function( serviceName, endCurIterate ) {
-                            question.execute(defaultEnv.services[serviceName]).then( ({volumes, ports}) => {
+                            question.execute(defaultEnv.services[serviceName]).then( ({volumes, ports, container_name}) => {
                                 defaultEnv.services[serviceName].volumes = volumes;
                                 defaultEnv.services[serviceName].ports = ports;
+                                defaultEnv.services[serviceName].container_name = container_name;
                                 endCurIterate();
                             });
                         }).then( _ => callback() );
@@ -107,15 +121,18 @@ const question = {
                 }).then( _ => responseQuestions);
             }
             await promiseQuestions;
-            // if(responseQuestions){
-                // UtilApp.generateEnvFile(defaultEnv);
-            // }
             defaultEnv  = this.removeBuildParams(defaultEnv);
+            defaultEnv  = this.removeUnselectedServices(defaultEnv, environments);
             UtilApp.generateComposeFile(defaultEnv);
             let env = UtilApp.getEnv();
-            // let nameServices = Object.keys(env.services);
+            env  = this.removeUnselectedServices(env, environments);
+            
             const REGISTRY_SET = environments.reduce( (setStructure, serviceName) => {
-                let { buildParams: { private: isPrivateRegistry }, image = '' } = (env.services[serviceName] || {});
+                let isPrivateRegistry = false;
+                let { buildParams, image = '' } = (env.services[serviceName] || {});
+                if ( buildParams && buildParams.private ) {
+                    isPrivateRegistry = true;
+                }
                 if( isPrivateRegistry ){
                     setStructure.add(docker.getRegistryByImage(image) || '');
                 }

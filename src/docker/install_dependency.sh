@@ -22,6 +22,7 @@ function configure_nvm {
     echo -e "export NVM_DIR=\"$HOME/.nvm\" \n [ -s \"$NVM_DIR/nvm.sh\" ] && \. \"$NVM_DIR/nvm.sh\" \n [ -s \"$NVM_DIR/bash_completion\" ] && \. \"$NVM_DIR/bash_completion\" " \
         >> /home/developer/.bashrc
     source /home/developer/.bashrc
+
     nvm install --lts 
     npm install -g tecfood-apkgen cordova bower
 }
@@ -45,7 +46,7 @@ function install_deps_android {
     } || {
         wget -O sdk-tools.zip $DEFAULT_TOOLS_LINK
     }
-    ls -lha
+    
     if [ -f ./sdk-tools.zip ]; then
         unzip sdk-tools.zip && mv cmdline-tools $HOME/android/cmdline-tools/tools
         curl -s "https://get.sdkman.io" | bash 

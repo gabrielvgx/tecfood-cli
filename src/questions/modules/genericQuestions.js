@@ -75,21 +75,32 @@ const genericQuestions = {
             return null;
         }
     },
+    async crudTextItem(message, initial) {
+        const type = 'text';
+        const name = 'value';
+        const { value } = await prompts({ type, name, message, initial });
+        return value;
+    },
     async execute( config ){
         const {
             volumes,
             ports,
             container_name
         } = config;
-        let newVolumes = await this.crudListItem(volumes, `Volume (${container_name})`, '/path/host:/path/docker');
+        let containerName = await this.crudTextItem("Nome do Container: ", container_name);
+        if(!containerName) {
+            containerName = container_name;
+        }
+        let newVolumes = await (volumes ? this.crudListItem(volumes, `Volume (${container_name})`, '/path/host:/path/docker') : Promise.resolve(null));
         if(!newVolumes) {
-            console.log('cancelVolumes', volumes);
             newVolumes = volumes;
         }
-        let newPorts = await this.crudListItem(ports, `Porta (${container_name})`, 'PORTA_HOST:PORTA_DOCKER');
-        if(!newPorts) newPorts = ports;
+        let newPorts = await (ports ? this.crudListItem(ports, `Porta (${container_name})`, 'PORTA_HOST:PORTA_DOCKER') : Promise.resolve(null));
+        if(!newPorts) {
+            newPorts = ports;
+        }
         let copyConfig = JSON.parse(JSON.stringify(config));
-        return Object.assign(copyConfig, {volumes: newVolumes, ports: newPorts});
+        return Object.assign(copyConfig, {volumes: newVolumes, ports: newPorts, container_name: containerName});
     }
 }
 const {
