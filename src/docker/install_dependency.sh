@@ -1,5 +1,7 @@
 #!/bin/bash
 
+USE_LATEST_VERSION=$1
+
 function install_required_deps {
     sudo apt-get update && sudo apt-get install -y --no-install-recommends \
         ca-certificates \
@@ -32,6 +34,19 @@ function custom_bash {
         >> ~/.bashrc
     source ~/.bashrc
 }
+
+function buildEnvVariablesAndroid {
+    export ANDROID_SDK_ROOT=$HOME/android
+    export ANDROID_HOME=$ANDROID_SDK_ROOT
+    export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
+
+    printf '%s\n' \
+            "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" \
+            "export ANDROID_HOME=$ANDROID_HOME" \
+            "export PATH=$PATH" \
+            >> $HOME/.bashrc
+    source $HOME/.bashrc
+}
  
 function install_deps_android {
     DEFAULT_TOOLS_LINK="https://dl.google.com/android/repository/commandlinetools-linux-7583922_latest.zip"
@@ -52,25 +67,27 @@ function install_deps_android {
         curl -s "https://get.sdkman.io" | bash 
         source "/home/developer/.sdkman/bin/sdkman-init.sh"
         sdk install gradle
+
+        buildEnvVariablesAndroid
         
-        export ANDROID_SDK_ROOT=$HOME/android
-        export ANDROID_HOME=$ANDROID_SDK_ROOT
-        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/tools/bin
-        
-        # GET LAST VERSION build-tools
-        # BUILD_TOOLS_VERSION=$(sdkmanager --list | grep -i 'build-tools;' | tail -1 | grep -Eo '[^ ]+' | head -1)
-        
-        printf '%s\n' \
-                "export ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" \
-                "export ANDROID_HOME=$ANDROID_HOME" \
-                "export PATH=$PATH" \
-                >> $HOME/.bashrc
-        source $HOME/.bashrc
-        # if [ -z $BUILD_TOOLS_VERSION ]; then
-        #     BUILD_TOOLS_VERSION=$DEFAULT_BUILD_TOOLS_VERSION
-        # fi
-        yes | sdkmanager --install "build-tools;$DEFAULT_BUILD_TOOLS_VERSION"
-        yes | sdkmanager --install "platforms;android-$DEFAULT_PLATFORM_ANDROID_VERSION"
+        BUILD_TOOLS_VERSION=""
+        PLATFORMS_ANDROID_VERSION=""
+
+        if [ USE_LATEST_VERSION = "true" ]; then
+            BUILD_TOOLS_VERSION=$(sdkmanager --list | grep -i 'build-tools;' | tail -1 | grep -Eo '[^ ]+' | head -1)
+            PLATFORMS_ANDROID_VERSION=$(sdkmanager --list | grep -Eio 'platforms;android-[0-9]{2}' | tail -1)
+        fi
+
+        if [ -z $BUILD_TOOLS_VERSION ]; then
+            BUILD_TOOLS_VERSION=$DEFAULT_BUILD_TOOLS_VERSION
+        fi
+        if [ -z $PLATFORMS_ANDROID_VERSION ]; then
+            PLATFORMS_ANDROID_VERSION=$DEFAULT_PLATFORM_ANDROID_VERSION
+        fi
+
+        yes | sdkmanager --install "build-tools;$BUILD_TOOLS_VERSION"
+        yes | sdkmanager --install "platforms;android-$PLATFORMS_ANDROID_VERSION"
+
     else
         echo 'Error install android_deps'
         exit 1
@@ -87,7 +104,11 @@ function clean {
 }
 
 {
-    install_required_deps && configure_nvm && install_deps_android && custom_bash && clean
+    install_required_deps   &&\
+    configure_nvm           &&\
+    install_deps_android    &&\
+    custom_bash             &&\
+    clean
 } || {
     echo 'Error install deps'
     exit 1

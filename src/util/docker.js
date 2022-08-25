@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import path from 'path';
-import { eachSeries } from 'async';
+import async from 'async';
 import { getAppRootPath, getPathConfigFolderDocker } from './app.js';
 import terminal from './terminal.js';
 
@@ -30,7 +30,7 @@ const docker = {
     async runServices( services ){
         const { COMPOSE_FILE_PATH } = this.getDockerConfig();
         const promises = [];
-        eachSeries(services, function(serviceName, callback){
+        async.eachSeries(services, function(serviceName, callback){
             const SERVICE_NAME = serviceName.toLowerCase();
             const ARGS = `"${COMPOSE_FILE_PATH}" "${SERVICE_NAME}"`;
             terminal.execute(`docker_up_service.sh`, ARGS, true).finally(()=>{

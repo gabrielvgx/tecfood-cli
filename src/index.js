@@ -1,5 +1,6 @@
 import path from 'path';
 import os from 'os';
+import fs from 'fs';
 
 import question from './questions/question.js';
 import app from './util/app.js';
@@ -33,6 +34,13 @@ function build(){
         }
     };
     app.generateEnvFile(DEFAULT_CONFIG);
+    let customSshFolder = path.join(HOME_PATH, '.docker-ssh');
+    fs.mkdirSync(customSshFolder, {recursive: true});
+    const files = fs.readdirSync(customSshFolder);
+    files.forEach( file => {
+        fs.unlinkSync(path.resolve(customSshFolder, file));
+    });
+
 }
 build();
 question.executeQuestions().then( services => {

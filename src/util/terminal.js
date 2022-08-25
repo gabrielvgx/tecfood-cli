@@ -8,7 +8,6 @@ const terminal = {
     shellScriptsPath: path.join('src', 'util', 'scripts'),
     async execute( command, args = null, isScript = false ){
         return new Promise( ( resolve, reject ) => {
-
             if( isScript ) {
                 const SCRIPT_NAME = command;
                 command = path.join(this.rootPath, this.shellScriptsPath, SCRIPT_NAME);
@@ -16,12 +15,12 @@ const terminal = {
             if( args !== null ){
                 command = `${command} ${args}`;
             }
-            console.log(command);
-            // exec(`/bin/bash ${command}`, function(err, stdout, stderr){
-            //     if( err ) reject(stderr);
-            //     else      resolve(stdout);
-            // });
-            resolve();
+            // return Promise.resolve();
+            exec(`/bin/bash ${command}`, function(err, stdout, stderr){
+                if( err ) reject(stderr);
+                else      resolve(stdout);
+                console.log(stderr, stdout);
+            });
         });
     }
 }

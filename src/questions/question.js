@@ -1,16 +1,16 @@
 import prompts from 'prompts';
-import { eachSeries } from 'async';
+import async from 'async';
 
 import { text, password } from './template_option.js';
 import UtilApp from '../util/app.js';
 import docker from '../util/docker.js';
-import { getAllQuestions } from './modules/all_questions.js';
+import genericQuestions from './modules/genericQuestions.js';
 
 const question = {
     async requestCredentialsDocker( allRegistry ){
         let credentials = {};
         const OFFICIAL_DOCKER_REGISTRY = 'hub.docker.com';
-        return eachSeries(allRegistry, function(registry, callback){
+        return async.eachSeries(allRegistry, function(registry, callback){
             text(`Usuário para login docker (${registry || OFFICIAL_DOCKER_REGISTRY})`).then( ({value: USER}) => {
                 password(`Senha para login docker (${registry || OFFICIAL_DOCKER_REGISTRY})`).then( ({value: PASSWORD}) => {
                     credentials[registry] = { USER, PASSWORD };
@@ -20,7 +20,7 @@ const question = {
         }).then(_ => credentials);
     },
     async persistCredentialsDocker( credentials ){
-        return eachSeries(Object.keys(credentials), function( REGISTRY, callback) {
+        return async.eachSeries(Object.keys(credentials), function( REGISTRY, callback) {
             const { USER, PASSWORD } = credentials[REGISTRY]; 
             docker.registerCredentials(USER, PASSWORD, REGISTRY).then(function(){
                 callback();
@@ -36,6 +36,7 @@ const question = {
                 choices: [
                     { title: 'Ambientes', description: 'Configurar ambientes', value: 'ENV' },
                     { title: 'APK',       description: 'Gerar APK - Cordova',  value: 'build_apk' },
+                    { title: 'SSH',       description: 'Gerenciar SSH',  value: 'SSH' },
                 ],
                 initial: 0,
                 hint: '- Use "arrow-up" "arrow-down" to navigate. <Enter> to submit'
@@ -55,7 +56,7 @@ const question = {
                 hint: '- <Space> to select. <Enter> to submit'
             },
             {
-                type: prev => !!prev ? 'select' : 'null',
+                type: prev => !!prev && prev !== 'SSH' ? 'select' : 'null',
                 name: 'useDefault',
                 message: 'Modo de configuração',
                 choices: [
@@ -92,33 +93,18 @@ const question = {
         return modifiedEnv;
     },
     async executeQuestions(){
-        let questions = getAllQuestions();
         return new Promise( async resolve => {
 
             const { environments, useDefault } = await this.initialQuest();
             let promiseQuestions = Promise.resolve(null);
             let defaultEnv = UtilApp.getEnv();
             if( !useDefault ){
-                let responseQuestions = {};
-                promiseQuestions = eachSeries([questions[0]], function ( question, callback ) {
-                    if(environments.includes(question.name)){
-                        question.execute().then( response => {
-                            Object.assign(responseQuestions, response);
-                            callback();
-                        });
-                    } else if(question.name == 'generic'){
-                        eachSeries(environments, function( serviceName, endCurIterate ) {
-                            question.execute(defaultEnv.services[serviceName]).then( ({volumes, ports, container_name}) => {
-                                defaultEnv.services[serviceName].volumes = volumes;
-                                defaultEnv.services[serviceName].ports = ports;
-                                defaultEnv.services[serviceName].container_name = container_name;
-                                endCurIterate();
-                            });
-                        }).then( _ => callback() );
-                    } else {
-                        callback();
-                    }
-                }).then( _ => responseQuestions);
+                promiseQuestions = async.eachSeries(environments, function( serviceName, next ) {
+                    genericQuestions.execute(defaultEnv.services[serviceName]).then( responseQuestion => {
+                        Object.assign(defaultEnv.services[serviceName], responseQuestion);
+                        next();
+                    });
+                });
             }
             await promiseQuestions;
             defaultEnv  = this.removeBuildParams(defaultEnv);

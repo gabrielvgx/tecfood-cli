@@ -4,14 +4,17 @@ import { text } from '../template_option.js';
 
 const genericQuestions = {
     name: "generic",
-    async crudListItem( listItems, titleQuestion, messageAddItem, chrSeparator = ':'){
-        const STYLE = '\n\t';
-        const hint = STYLE.concat(listItems.join(STYLE));
-        const CANCEL_OPTION = {
+    getCancelOption(){
+        return ({
             title: "Cancelar",
             value: "CANCEL"
-        };
-        let choices = listItems.map( item => ({title: item, value: item}))
+        });
+    },
+    async crudListItem( listItems, titleQuestion, messageAddItem, showDockerAndHostValue = true, chrSeparator = ':'){
+        const STYLE = '\n\t';
+        const hint = STYLE.concat(listItems.join(STYLE));
+        const CANCEL_OPTION = this.getCancelOption();
+        let choices = listItems.map( item => typeof item == 'string' ? ({title: item, value: item}) : item)
                              .concat(CANCEL_OPTION);
 
         const execQuestionGetItem = async (hostValue, dockerValue) => {
@@ -50,10 +53,12 @@ const genericQuestions = {
             let indexOldItem = -1;
             let newListItems = [...listItems];
             if ( ['EDIT', 'DELETE'].includes(operation) ) {
-                let [ host, docker ] = itemSelection.split(':');
+                let [ host, docker ] = showDockerAndHostValue ? itemSelection.split(':') : [itemSelection, null];
                 dockerValue = docker;
                 hostValue = host;
-                indexOldItem = listItems.findIndex( item => item === `${host}${chrSeparator}${docker}`);
+                indexOldItem = showDockerAndHostValue 
+                                ? listItems.findIndex( item => item === `${host}${chrSeparator}${docker}`)
+                                : listItems.findIndex( item => item === host);
             }
             switch( operation ) {
                 case 'ADD': 
@@ -62,7 +67,7 @@ const genericQuestions = {
                     break;
                 case 'EDIT': 
                     let { value: NEW_HOST } = await execQuestionGetItem(hostValue, dockerValue);
-                    newListItems[indexOldItem] = `${NEW_HOST}:${dockerValue}`;
+                    newListItems[indexOldItem] = showDockerAndHostValue ? `${NEW_HOST}:${dockerValue}` : NEW_HOST;
                     break;
                 case 'DELETE': 
                     newListItems.splice(indexOldItem, 1);
@@ -70,7 +75,7 @@ const genericQuestions = {
                 default: 
                     break;
             }
-            return await this.crudListItem(newListItems, titleQuestion, messageAddItem, chrSeparator);
+            return await this.crudListItem(newListItems, titleQuestion, messageAddItem, showDockerAndHostValue, chrSeparator);
         } else {
             return null;
         }
