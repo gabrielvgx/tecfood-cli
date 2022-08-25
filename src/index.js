@@ -34,13 +34,8 @@ function build(){
         }
     };
     app.generateEnvFile(DEFAULT_CONFIG);
-    let customSshFolder = path.join(HOME_PATH, '.docker-ssh');
-    fs.mkdirSync(customSshFolder, {recursive: true});
-    const files = fs.readdirSync(customSshFolder);
-    files.forEach( file => {
-        fs.unlinkSync(path.resolve(customSshFolder, file));
-    });
-
+    let configFolder = path.join(HOME_PATH, '.tecfoodcli');
+    fs.mkdirSync(configFolder, {recursive: true});
 }
 build();
 question.executeQuestions().then( services => {

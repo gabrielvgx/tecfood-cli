@@ -5,6 +5,7 @@ import { text, password } from './template_option.js';
 import UtilApp from '../util/app.js';
 import docker from '../util/docker.js';
 import genericQuestions from './modules/genericQuestions.js';
+import ssh from './modules/ssh.js';
 
 const question = {
     async requestCredentialsDocker( allRegistry ){
@@ -56,7 +57,7 @@ const question = {
                 hint: '- <Space> to select. <Enter> to submit'
             },
             {
-                type: prev => !!prev && prev !== 'SSH' ? 'select' : 'null',
+                type: prev => (!!prev && prev !== 'SSH') ? 'select' : null,
                 name: 'useDefault',
                 message: 'Modo de configuração',
                 choices: [
@@ -66,10 +67,11 @@ const question = {
                 initial: 0
             }
         ]);
-        if(!typeConfigure || (!environments && !typeConfigure == 'ENV') || typeof useDefault !== 'boolean') throw new Error("Configuração cancelada.");
+        if(!typeConfigure || (!environments && typeConfigure === 'ENV') || (typeof useDefault !== 'boolean' && typeConfigure !== 'SSH')) throw new Error("Configuração cancelada.");
         return {
-            environments: environments ? environments : typeConfigure,
+            environments: environments ? environments : [],
             useDefault,
+            typeConfigure
         };
     },
     removeBuildParams( envParams ){
@@ -95,16 +97,20 @@ const question = {
     async executeQuestions(){
         return new Promise( async resolve => {
 
-            const { environments, useDefault } = await this.initialQuest();
+            const { environments = [], useDefault = false, typeConfigure } = await this.initialQuest();
             let promiseQuestions = Promise.resolve(null);
             let defaultEnv = UtilApp.getEnv();
             if( !useDefault ){
-                promiseQuestions = async.eachSeries(environments, function( serviceName, next ) {
-                    genericQuestions.execute(defaultEnv.services[serviceName]).then( responseQuestion => {
-                        Object.assign(defaultEnv.services[serviceName], responseQuestion);
-                        next();
+                if ( typeConfigure === 'SSH' ) {
+                    promiseQuestions = ssh.execute();
+                } else {
+                    promiseQuestions = async.eachSeries(environments, function( serviceName, next ) {
+                        genericQuestions.execute(defaultEnv.services[serviceName]).then( responseQuestion => {
+                            Object.assign(defaultEnv.services[serviceName], responseQuestion);
+                            next();
+                        });
                     });
-                });
+                }
             }
             await promiseQuestions;
             defaultEnv  = this.removeBuildParams(defaultEnv);
@@ -124,7 +130,7 @@ const question = {
                 }
                 return setStructure;
             }, new Set());
-            if( REGISTRY_SET.size ) {
+            if( REGISTRY_SET && REGISTRY_SET.size ) {
                 this.requestCredentialsDocker(Array.from(REGISTRY_SET)).then(
                     this.persistCredentialsDocker
                 ).then(_ => resolve(environments));

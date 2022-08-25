@@ -3,6 +3,7 @@ import axios from 'axios';
 const gitlab = {
     host: "",
     token: "",
+    email: "",
     endPoints: {
         API: "/api/v4",
         SSH: "/user/keys"
@@ -22,11 +23,15 @@ const gitlab = {
         const { data } = await axios.get(URL, options);
         return data;
     },
-    async createSSH(title, key, expires_at){
+    async createSSH(title, key, expires_at = null){
         const URL = this.getUrlApi() + this.endPoints.SSH;
         const options = this.getDefaultOptions();
         options.data = { title, key, expires_at };
-        const { data } = await axios.post(URL, options);
+        options.method = 'POST';
+        options.url = URL;
+        const { data } = await axios(options).catch( error => {
+            console.log(error);
+        });
         return data;
     },
     async deleteSSH( keyID ){

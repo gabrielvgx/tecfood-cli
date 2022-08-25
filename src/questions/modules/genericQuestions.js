@@ -1,4 +1,6 @@
 import prompts from 'prompts';
+import os from 'os';
+import path from 'path';
 
 import { text } from '../template_option.js';
 
@@ -105,11 +107,13 @@ const genericQuestions = {
             newPorts = ports;
         }
         let copyConfig = JSON.parse(JSON.stringify(config));
-        return Object.assign(copyConfig, {volumes: newVolumes, ports: newPorts, container_name: containerName});
+        let configFolder = path.join(os.homedir(), '.tecfoodcli');
+        let configVolume = `${configFolder}:/.tecfoodcli`;
+        return Object.assign(copyConfig, {volumes: newVolumes.concat(configVolume), ports: newPorts, container_name: containerName});
     }
 }
 const {
-    execute
+    execute,
 } = genericQuestions;
 
 export { execute };

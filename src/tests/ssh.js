@@ -9,6 +9,7 @@ const SSH = {
     getToken(){
         return 'AXYCjbwHuNyxqZqJaKUB';
     },
+    // {"headers":{"PRIVATE-TOKEN":"AXYCjbwHuNyxqZqJaKUB"}
     getHeader(){
         return ({
             'PRIVATE-TOKEN': this.getToken()
