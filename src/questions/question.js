@@ -6,6 +6,7 @@ import UtilApp from '../util/app.js';
 import docker from '../util/docker.js';
 import genericQuestions from './modules/genericQuestions.js';
 import ssh from './modules/ssh.js';
+import apk from './modules/apk.js';
 
 const question = {
     async requestCredentialsDocker( allRegistry ){
@@ -36,7 +37,7 @@ const question = {
                 message: 'Em que posso ajudar?',
                 choices: [
                     { title: 'Ambientes', description: 'Configurar ambientes', value: 'ENV' },
-                    { title: 'APK',       description: 'Gerar APK - Cordova',  value: 'build_apk' },
+                    { title: 'APK',       description: 'Gerar APK - Cordova',  value: 'APK' },
                     { title: 'SSH',       description: 'Gerenciar SSH',  value: 'SSH' },
                 ],
                 initial: 0,
@@ -57,7 +58,7 @@ const question = {
                 hint: '- <Space> to select. <Enter> to submit'
             },
             {
-                type: prev => (!!prev && prev !== 'SSH') ? 'select' : null,
+                type: prev => (!!prev && !['SSH', 'APK'].includes(prev)) ? 'select' : null,
                 name: 'useDefault',
                 message: 'Modo de configuração',
                 choices: [
@@ -67,7 +68,10 @@ const question = {
                 initial: 0
             }
         ]);
-        if(!typeConfigure || (!environments && typeConfigure === 'ENV') || (typeof useDefault !== 'boolean' && typeConfigure !== 'SSH')) throw new Error("Configuração cancelada.");
+        if(!typeConfigure || 
+            (!environments && typeConfigure === 'ENV') || 
+            (typeof useDefault !== 'boolean' && !['SSH', 'APK'].includes(typeConfigure))
+        ) throw new Error("Configuração cancelada.");
         return {
             environments: environments ? environments : [],
             useDefault,
@@ -101,15 +105,21 @@ const question = {
             let promiseQuestions = Promise.resolve(null);
             let defaultEnv = UtilApp.getEnv();
             if( !useDefault ){
-                if ( typeConfigure === 'SSH' ) {
-                    promiseQuestions = ssh.execute();
-                } else {
-                    promiseQuestions = async.eachSeries(environments, function( serviceName, next ) {
-                        genericQuestions.execute(defaultEnv.services[serviceName]).then( responseQuestion => {
-                            Object.assign(defaultEnv.services[serviceName], responseQuestion);
-                            next();
+                switch( typeConfigure ) {
+                    case 'SSH':
+                        promiseQuestions = ssh.execute();
+                        break;
+                    case 'APK':
+                        promiseQuestions = apk.execute();
+                        break;
+                    default:
+                        promiseQuestions = async.eachSeries(environments, function( serviceName, next ) {
+                            genericQuestions.execute(defaultEnv.services[serviceName]).then( responseQuestion => {
+                                Object.assign(defaultEnv.services[serviceName], responseQuestion);
+                                next();
+                            });
                         });
-                    });
+                        break;
                 }
             }
             await promiseQuestions;
