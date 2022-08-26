@@ -5,7 +5,7 @@ SHELL [ "/bin/bash", "-l", "-c" ]
 ARG HOME_DIR=/home/developer
 ARG DEFAULT_BUILD_TOOLS_VERSION="29.0.0"
 ARG DEFAULT_PLATFORM_ANDROID_VERSION="27"
-ARG USE_LATEST_VERSION="true"
+ARG USE_LATEST_VERSION="false"
 ARG WORKFOLDER=${HOME_DIR}/workfolder
 
 COPY ./configure_user.sh ${WORKFOLDER}/configure_user.sh

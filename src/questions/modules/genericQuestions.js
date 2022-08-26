@@ -108,7 +108,8 @@ const genericQuestions = {
         }
         let copyConfig = JSON.parse(JSON.stringify(config));
         let configFolder = path.join(os.homedir(), '.tecfoodcli');
-        let configVolume = `${configFolder}:/.tecfoodcli`;
+        let configVolume = `${configFolder}:/home/developer/.tecfoodcli`;
+        
         return Object.assign(copyConfig, {volumes: newVolumes.concat(configVolume), ports: newPorts, container_name: containerName});
     }
 }

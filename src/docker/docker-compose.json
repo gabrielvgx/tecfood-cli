@@ -4,8 +4,8 @@
         "app": {
             "image": "gvgx/cordova-app-tecfood:latest",
             "container_name": "app-container",
-            "build": "./build/app",
-            "working_dir": "/var/www",
+            "build": ".",
+            "working_dir": "/home/developer/workfolder",
             "restart": "always",
             "tty": true,
             "networks": [

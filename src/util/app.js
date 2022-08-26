@@ -33,6 +33,27 @@ const app = {
         const ENV = JSON.parse(fs.readFileSync(PATH_ENV, 'utf8'));
         return ENV;
     },
+    getPathAppConfig(){
+        return path.join(os.homedir(), '.tecfoodcli');
+    },
+    loadAppConfig( fileName ){
+        let configFolder = this.getPathAppConfig();
+        let configFile = path.join(configFolder, fileName);
+        fs.mkdirSync(configFolder, {recursive: true});
+        if(app.hasAccess(configFile)) {
+            let content = fs.readFileSync(configFile, 'utf8');
+            return JSON.parse(content);
+        } else {
+            fs.writeFileSync(configFile, '{}');
+            return ({});
+        }
+    },
+    updateAppConfig( fileName, config ){
+        let oldConfig = this.loadAppConfig( fileName );
+        let newConfig = Object.assign(oldConfig, config);
+        let pathAppConfig = this.getPathAppConfig();
+        fs.writeFileSync(path.join(pathAppConfig, fileName), JSON.stringify(newConfig, null, 4));
+    },
     mergeEnv(defaultEnv, {services}) {
         let copyDefaultEnv = JSON.parse(JSON.stringify(defaultEnv));
         let serviceNames = Object.keys(copyDefaultEnv.services);

@@ -1,43 +1,44 @@
 import path from 'path';
 import os from 'os';
-import fs from 'fs';
+import emoji from 'node-emoji';
+import getPort, {portNumbers} from 'get-port';
 
 import question from './questions/question.js';
 import app from './util/app.js';
 import docker from './util/docker.js';
-import emoji from 'node-emoji';
 
-function build(){
+async function build(){
     const HOME_PATH = os.homedir();
-    const IP_PROXY = 'http://192.168.122.121:3128';
     const WORKDIR_PATH = `${HOME_PATH}/workfolder`;
+    let availablePorts = [];
+    availablePorts = availablePorts.concat( await getPort({port: portNumbers(3000, 3100)}) );
+    availablePorts = availablePorts.concat( await getPort({
+        port: [9191, 8080].concat(Array.from(portNumbers(9000, 9100)))
+    }) );
+    availablePorts = availablePorts.concat( await getPort({
+        port: [27017].concat(Array.from(portNumbers(27000, 27100)))
+    }) );
     const DEFAULT_CONFIG = {
         services: {
             app: {
-                volumes: [ `${WORKDIR_PATH}:/var/www` ]
+                volumes: [ `${WORKDIR_PATH}:/home/developer/workfolder` ]
             },
             basedev: {
                 volumes: [ `${WORKDIR_PATH}:/home/developer/workfolder` ],
-                ports: [ "3000:80" ]
+                ports: [ `${availablePorts.shift()}:80` ]
             },
             birt: {
-                environment: [
-                    `http_proxy=${IP_PROXY}`,
-                    `https_proxy=${IP_PROXY}`,
-                ],
                 volumes: [ `${WORKDIR_PATH}:/var/www` ],
-                ports: [ "9191:9191" ]
+                ports: [ `${availablePorts.shift()}:9191` ]
             },
             mongo: {
-                ports: [ "27017:27017" ]
+                ports: [ `${availablePorts.shift()}:27017` ]
             }
         }
     };
     app.generateEnvFile(DEFAULT_CONFIG);
-    let configFolder = path.join(HOME_PATH, '.tecfoodcli');
-    fs.mkdirSync(configFolder, {recursive: true});
 }
-build();
+await build();
 question.executeQuestions().then( services => {
     const ROOT_PATH = app.getAppRootPath();
     const dockerComposeFile = path.join(ROOT_PATH, 'src', 'docker', 'docker-compose.yml');

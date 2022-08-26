@@ -1,6 +1,7 @@
 import prompts from 'prompts';
 import gitlab from '../../util/gitlab.js';
 import UtilSsh from '../../util/ssh.js';
+import UtilApp from '../../util/app.js';
 
 const ssh = {
     name: 'SSH',
@@ -59,22 +60,25 @@ const ssh = {
         }
     },
     async execute(){
+        const userConfig = UtilApp.loadAppConfig('auth.json');
         const { host, email, token } = await prompts([
             {
                 type: 'text',
                 name: 'host',
                 message: 'Host (Repositorio Remoto)',
-                initial: 'http://gitlab.teknisa.com'
+                initial: userConfig.host
             },
             {
                 type: 'text',
                 name: 'email',
-                message: 'Email: '
+                message: 'Email: ',
+                initial: userConfig.email
             },
             {
                 type: 'text',
                 name: "token",
-                message: "Token (GitLab): "
+                message: "Token (GitLab): ",
+                initial: userConfig.token
             }
         ]);
         let response = [];
@@ -82,9 +86,8 @@ const ssh = {
             gitlab.host = host;
             gitlab.token = token;
             gitlab.email = email;
+            UtilApp.updateAppConfig('auth.json', {host, token, email});
             await this.handleSshKeys();
-            // response = sshList;
-            // console.log(sshList);
         }
         return response;
     }

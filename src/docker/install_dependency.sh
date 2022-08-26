@@ -73,9 +73,9 @@ function install_deps_android {
         BUILD_TOOLS_VERSION=""
         PLATFORMS_ANDROID_VERSION=""
 
-        if [ USE_LATEST_VERSION = "true" ]; then
-            BUILD_TOOLS_VERSION=$(sdkmanager --list | grep -i 'build-tools;' | tail -1 | grep -Eo '[^ ]+' | head -1)
-            PLATFORMS_ANDROID_VERSION=$(sdkmanager --list | grep -Eio 'platforms;android-[0-9]{2}' | tail -1)
+        if [ $USE_LATEST_VERSION = "true" ]; then
+            BUILD_TOOLS_VERSION=$(sdkmanager --list | grep -i 'build-tools;' | tail -1 | grep -Eo '[^ ]+' | head -1 | grep -Eio '[0-9.]+')
+            PLATFORMS_ANDROID_VERSION=$(sdkmanager --list | grep -Eio 'platforms;android-[0-9]{2}' | tail -1 | grep -Eio '[0-9.]+')
         fi
 
         if [ -z $BUILD_TOOLS_VERSION ]; then
@@ -84,7 +84,10 @@ function install_deps_android {
         if [ -z $PLATFORMS_ANDROID_VERSION ]; then
             PLATFORMS_ANDROID_VERSION=$DEFAULT_PLATFORM_ANDROID_VERSION
         fi
-
+        echo "================================================================"
+        echo "build-tools: $BUILD_TOOLS_VERSION"
+        echo "platforms;android: $PLATFORMS_ANDROID_VERSION"
+        echo "================================================================"
         yes | sdkmanager --install "build-tools;$BUILD_TOOLS_VERSION"
         yes | sdkmanager --install "platforms;android-$PLATFORMS_ANDROID_VERSION"
 
