@@ -43,7 +43,6 @@ const docker = {
                             observer.next(IMAGE);
                             terminal.execute(`docker_pull.sh`, IMAGE, true).finally(()=>{
                                 callback();
-                                console.log('finish');
                             });
                         }).then( _ => {
                             observer.complete();
