@@ -15,11 +15,10 @@ const terminal = {
             if( args !== null ){
                 command = `${command} ${args}`;
             }
-            // return Promise.resolve();
+            
             exec(`/bin/bash ${command}`, function(err, stdout, stderr){
                 if( err ) reject(stderr);
                 else      resolve(stdout);
-                console.log(stderr, stdout);
             });
         });
     }

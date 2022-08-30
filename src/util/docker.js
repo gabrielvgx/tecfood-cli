@@ -1,7 +1,8 @@
-import { exec } from 'child_process';
+import { Observable } from 'rxjs';
+import Listr from 'listr';
 import path from 'path';
 import async from 'async';
-import { getAppRootPath, getPathConfigFolderDocker } from './app.js';
+import UtilApp from './app.js';
 import terminal from './terminal.js';
 
 const docker = {
@@ -11,7 +12,7 @@ const docker = {
         return registry;
     },
     async registerCredentials(USER, PASSWORD, REGISTRY = "", pathSaveCredential = null){
-        const PATH_SAVE_CREDENTIAL = pathSaveCredential || getPathConfigFolderDocker();
+        const PATH_SAVE_CREDENTIAL = pathSaveCredential || UtilApp.getPathConfigFolderDocker();
         const ARGS = `"${REGISTRY}" "${USER}" "${PASSWORD}" "${PATH_SAVE_CREDENTIAL}"`;
         return terminal.execute(`docker_create_credential.sh`, ARGS, true);
     },
@@ -21,7 +22,7 @@ const docker = {
         });
     },
     getDockerConfig(){
-        const ROOT_PATH = getAppRootPath();
+        const ROOT_PATH = UtilApp.getAppRootPath();
         const COMPOSE_FILE_PATH = path.join(ROOT_PATH, 'src', 'docker');
         return {
             COMPOSE_FILE_PATH
@@ -29,15 +30,46 @@ const docker = {
     },
     async runServices( services ){
         const { COMPOSE_FILE_PATH } = this.getDockerConfig();
-        const promises = [];
-        async.eachSeries(services, function(serviceName, callback){
-            const SERVICE_NAME = serviceName.toLowerCase();
-            const ARGS = `"${COMPOSE_FILE_PATH}" "${SERVICE_NAME}"`;
-            terminal.execute(`docker_up_service.sh`, ARGS, true).finally(()=>{
-                callback();
-            });
-        });
-        return Promise.allSettled( promises );
+        let env = UtilApp.getEnv();
+        const tasks = new Listr([
+            {
+                title: 'Pull Images',
+                task: () => {
+                    return new Observable(observer => {
+                        let selectedServices = Object.keys(env.services).filter( serv => services.includes(serv));
+                        async.eachSeries(selectedServices, function(serviceName, callback){
+                            const SERVICE_NAME = serviceName.toLowerCase();
+                            const IMAGE = env.services[SERVICE_NAME].image;
+                            observer.next(IMAGE);
+                            terminal.execute(`docker_pull.sh`, IMAGE, true).finally(()=>{
+                                callback();
+                                console.log('finish');
+                            });
+                        }).then( _ => {
+                            observer.complete();
+                        });
+
+                    });
+                }
+            },
+            {
+                title: '(Re)Creating containers',
+                task: () => {
+                    return new Observable( observer => {
+                        async.eachSeries(services, function(serviceName, callback){
+                            const SERVICE_NAME = serviceName.toLowerCase();
+                            const ARGS = `"${COMPOSE_FILE_PATH}" "${SERVICE_NAME}"`;
+                            observer.next(env.services[SERVICE_NAME].container_name);
+                            terminal.execute(`docker_up_service.sh`, ARGS, true).finally(()=>{
+                                callback();
+                            });
+                        }).then( _ => observer.complete());
+                    });
+                }
+            }
+        ]);
+        
+        return tasks.run();
     }
 };
 
