@@ -8,16 +8,21 @@ const terminal = {
     shellScriptsPath: path.join('src', 'util', 'scripts'),
     async execute( command, args = null, isScript = false ){
         return new Promise( ( resolve, reject ) => {
+            let prefixCommand = `/bin/bash `;
+            let suffixCommand = ``;
             if( isScript ) {
                 const SCRIPT_NAME = command;
                 command = path.join(this.rootPath, this.shellScriptsPath, SCRIPT_NAME);
+            } else {
+                prefixCommand += `-c "`;
+                suffixCommand += `"`;
             }
             if( args !== null ){
                 command = `${command} ${args}`;
             }
             
-            exec(`/bin/bash ${command}`, function(err, stdout, stderr){
-                if( err ) reject(stderr);
+            exec(`${prefixCommand}${command}${suffixCommand}`, function(err, stdout, stderr){
+                if( err || stderr) reject(stderr);
                 else      resolve(stdout);
             });
         });

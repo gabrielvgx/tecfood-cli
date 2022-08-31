@@ -1,5 +1,6 @@
 import prompts from 'prompts';
 import UtilApp from '../../util/app.js';
+import UtilApk from '../../util/apk.js';
 
 const apk = {
     name: 'APK',
@@ -20,6 +21,12 @@ const apk = {
         ]);
         return { title, path };
     },
+    registerAppCordovaConfig(title, path){
+        let appConfig = UtilApp.loadAppConfig('app.json');
+        appConfig.apps = appConfig.apps || {};
+        appConfig.apps[title] = path;
+        UtilApp.updateAppConfig('app.json', appConfig);
+    },
     async handleProfilesCordova(){
         let app = UtilApp.loadAppConfig('app.json').apps || {};
         let profileNames = Object.keys(app).sort();
@@ -37,10 +44,10 @@ const apk = {
                     message: "Apps",
                     hint,
                     choices: [
-                        { title: "Adicionar App", value: "ADD" },
-                        { title: "Editar App", value: "EDIT" },
-                        { title: "Excluir App", value: "DELETE"},
-                        { title: "Atualizar Lista", value: "RELOAD"},
+                        { title: "Adicionar", value: "ADD" },
+                        { title: "Editar", value: "EDIT" },
+                        { title: "Excluir", value: "DELETE"},
+                        { title: "Atualizar", value: "RELOAD"},
                         { title: "Build Debug", value: "BUILD_DEBUG"},
                         { title: "Build Release", value: "BUILD_RELEASE"},
                         { title: "Voltar", value: "BACK"},
@@ -70,10 +77,7 @@ const apk = {
                 case "ADD":
                     const { title, path } = await this.getQuestionProfile();
                     if( title && path ){
-                        let appConfig = UtilApp.loadAppConfig('app.json');
-                        appConfig.apps = appConfig.apps || {};
-                        appConfig.apps[title] = path;
-                        UtilApp.updateAppConfig('app.json', appConfig);
+                        this.registerAppCordovaConfig(title, path);
                         return this.handleProfilesCordova();
                     }
                     break;
@@ -105,6 +109,9 @@ const apk = {
                 case "RELOAD":
                     return this.handleProfilesCordova();
                 case "BUILD_DEBUG":
+                    let resp = await UtilApk.buildApk(profileToBuild, "BUILD_DEBUG").catch( error => {
+                        console.log(error);
+                    });
                     break;
                 case "BUILD_RELEASE":
                     break;
@@ -115,6 +122,14 @@ const apk = {
         }
     },
     async execute(){
+        let filteredFolders = UtilApp.getFoldersInPath(null, folderName => {
+            return folderName.toLowerCase().includes('cordova');
+        });
+        if( Array.isArray(filteredFolders) ) {
+            filteredFolders.forEach(({name, fullPath}) => {
+                return this.registerAppCordovaConfig(name, fullPath);
+            });
+        }
         await this.handleProfilesCordova();
         return null;
     }

@@ -18,6 +18,30 @@ const app = {
         const APP_ROOT_PATH = CURRENT_PATH.replace(PATTERN, '');
         return APP_ROOT_PATH;
     },
+    getFoldersInPath( pathToRead = null, validateFuncOrPattern = null ){
+        if( !pathToRead ) {
+            let workfolderPath = path.join(os.homedir(), 'workfolder');
+            let appsPath = path.join(workfolderPath, 'apps');
+            return this.getFoldersInPath(workfolderPath, validateFuncOrPattern).concat(
+                this.getFoldersInPath(appsPath, validateFuncOrPattern)    
+            );
+        }
+        let structureData = (({name}) => ({
+            name,
+            path: pathToRead,
+            fullPath: path.join(pathToRead, name)
+        }));
+        return fs.readdirSync(pathToRead, {withFileTypes: true}).filter( curPath => {
+            let isDirectory = curPath.isDirectory();
+            let matchByPattern = true;
+            if ( validateFuncOrPattern instanceof RegExp ) {
+                matchByPattern = validateFuncOrPattern.exec(curPath);
+            } else if ( validateFuncOrPattern instanceof Function) {
+                matchByPattern = validateFuncOrPattern.apply(null, [curPath.name]);
+            }
+            return isDirectory && matchByPattern;
+        }).map( structureData );
+    },
     getEnvFilePath(){
         const APP_ROOT_PATH = this.getAppRootPath();
         const PATH_ENV = path.join(APP_ROOT_PATH, 'src', 'docker', '.docker-compose.json');

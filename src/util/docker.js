@@ -59,7 +59,9 @@ const docker = {
                             const SERVICE_NAME = serviceName.toLowerCase();
                             const ARGS = `"${COMPOSE_FILE_PATH}" "${SERVICE_NAME}"`;
                             observer.next(env.services[SERVICE_NAME].container_name);
-                            terminal.execute(`docker_up_service.sh`, ARGS, true).finally(()=>{
+                            terminal.execute(`docker_up_service.sh`, ARGS, true).catch(error => {
+                                console.log(error);
+                            }).finally(()=>{
                                 callback();
                             });
                         }).then( _ => observer.complete());
