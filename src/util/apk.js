@@ -1,7 +1,3 @@
-// import { Observable } from 'rxjs';
-// import Listr from 'listr';
-// import path from 'path';
-// import async from 'async';
 import UtilApp from './app.js';
 import terminal from './terminal.js';
 
@@ -20,6 +16,4 @@ const apk = {
     }
 };
 
-// const { registerCredentials } = docker;
-// export { registerCredentials };
 export default apk;

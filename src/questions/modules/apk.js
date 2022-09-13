@@ -109,12 +109,22 @@ const apk = {
                 case "RELOAD":
                     return this.handleProfilesCordova();
                 case "BUILD_DEBUG":
-                    let resp = await UtilApk.buildApk(profileToBuild, "BUILD_DEBUG").catch( error => {
+                case "BUILD_RELEASE":
+                    let resp = await UtilApk.buildApk(profileToBuild, operation).catch( error => {
                         console.log(error);
                     });
+                    if( resp.includes('BUILD FAILED')) {
+                        console.log(resp);
+                    } else if( resp.includes('BUILD SUCCESSFUL')) {
+                        let lines = resp.split('\n').filter( line => line.trim().length);
+                        let lastLine = lines[lines.length-1];
+                        console.log(lastLine);
+                    } else {
+                        console.log(resp);
+                    }
                     break;
-                case "BUILD_RELEASE":
-                    break;
+                case "BACK":
+                    return "BACK";
                 default:
                     return null;
             }
@@ -130,8 +140,7 @@ const apk = {
                 return this.registerAppCordovaConfig(name, fullPath);
             });
         }
-        await this.handleProfilesCordova();
-        return null;
+        return await this.handleProfilesCordova();
     }
 }
 

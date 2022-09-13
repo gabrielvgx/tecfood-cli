@@ -7,6 +7,11 @@ import question from './questions/question.js';
 import app from './util/app.js';
 import docker from './util/docker.js';
 
+process.on('unhandledRejection', error => {
+    console.log('unhandledRejection', error, error.message);
+});
+  
+
 async function build(){
     const HOME_PATH = os.homedir();
     const WORKDIR_PATH = `${HOME_PATH}/workfolder`;
@@ -24,7 +29,10 @@ async function build(){
                 volumes: [ `${WORKDIR_PATH}:/home/developer/workfolder` ]
             },
             basedev: {
-                volumes: [ `${WORKDIR_PATH}:/home/developer/workfolder` ],
+                volumes: [ 
+                    `${WORKDIR_PATH}:/home/developer/workfolder`,
+                    '/u01:/u01'
+                ],
                 ports: [ `${availablePorts.shift()}:80` ]
             },
             birt: {
@@ -39,11 +47,13 @@ async function build(){
     app.generateEnvFile(DEFAULT_CONFIG);
 }
 await build();
-question.executeQuestions().then( services => {
-    const ROOT_PATH = app.getAppRootPath();
-    const dockerComposeFile = path.join(ROOT_PATH, 'src', 'docker', 'docker-compose.yml');
-    if(app.hasAccess(dockerComposeFile)){
-        docker.runServices( services );
+question.executeQuestions().then( response => {
+    if ( response !== 'EXIT' ) {
+        const ROOT_PATH = app.getAppRootPath();
+        const dockerComposeFile = path.join(ROOT_PATH, 'src', 'docker', 'docker-compose.yml');
+        if(app.hasAccess(dockerComposeFile)){
+            docker.runServices( response );
+        }
     }
 }).catch( error => {
     console.error(emoji.get('x'), error.message);

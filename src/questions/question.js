@@ -7,7 +7,7 @@ import docker from '../util/docker.js';
 import genericQuestions from './modules/genericQuestions.js';
 import ssh from './modules/ssh.js';
 import apk from './modules/apk.js';
-
+import CliCommon from '../util/helpers/cli_common_questions.js';
 const question = {
     async requestCredentialsDocker( allRegistry ){
         let credentials = {};
@@ -24,7 +24,10 @@ const question = {
     async persistCredentialsDocker( credentials ){
         return async.eachSeries(Object.keys(credentials), function( REGISTRY, callback) {
             const { USER, PASSWORD } = credentials[REGISTRY]; 
-            docker.registerCredentials(USER, PASSWORD, REGISTRY).then(function(){
+            docker.registerCredentials(USER, PASSWORD, REGISTRY).then(function( response ){
+                if ( response !== true ) {
+                    console.log(`Error ${REGISTRY} ${response}`);
+                }
                 callback();
             });
         });
@@ -71,7 +74,14 @@ const question = {
         if(!typeConfigure || 
             (!environments && typeConfigure === 'ENV') || 
             (typeof useDefault !== 'boolean' && !['SSH', 'APK'].includes(typeConfigure))
-        ) throw new Error("Configuração cancelada.");
+        ) {
+            const confirmExit = await CliCommon.exit();
+            if ( confirmExit ) {
+                return 'EXIT';
+            } else {
+                return await this.initialQuest();
+            }
+        }
         return {
             environments: environments ? environments : [],
             useDefault,
@@ -99,9 +109,10 @@ const question = {
         return modifiedEnv;
     },
     async executeQuestions(){
-        return new Promise( async resolve => {
-
-            const { environments = [], useDefault = false, typeConfigure } = await this.initialQuest();
+        return new Promise( async (resolve, reject) => {
+            const resultQuestions = await this.initialQuest();
+            if( resultQuestions === 'EXIT') return 0;
+            const { environments = [], useDefault = false, typeConfigure } = resultQuestions;
             let promiseQuestions = Promise.resolve(null);
             let defaultEnv = UtilApp.getEnv();
             if( !useDefault ){
@@ -122,7 +133,10 @@ const question = {
                         break;
                 }
             }
-            await promiseQuestions;
+            const responseQuestions = await promiseQuestions;
+            if ( responseQuestions == 'BACK') {
+                return this.executeQuestions().then( _ => resolve()).catch( _ => reject());
+            }
             defaultEnv  = this.removeBuildParams(defaultEnv);
             defaultEnv  = this.removeUnselectedServices(defaultEnv, environments);
             UtilApp.generateComposeFile(defaultEnv);

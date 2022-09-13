@@ -9,6 +9,7 @@ function install_required_deps {
         wget \
         zip \
         unzip \
+        rsync \
         default-jdk \
         openssh-client \
         git-all

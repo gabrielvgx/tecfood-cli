@@ -14,7 +14,13 @@ const docker = {
     async registerCredentials(USER, PASSWORD, REGISTRY = "", pathSaveCredential = null){
         const PATH_SAVE_CREDENTIAL = pathSaveCredential || UtilApp.getPathConfigFolderDocker();
         const ARGS = `"${REGISTRY}" "${USER}" "${PASSWORD}" "${PATH_SAVE_CREDENTIAL}"`;
-        return terminal.execute(`docker_create_credential.sh`, ARGS, true);
+        let error = null;
+        await terminal.execute(`docker_create_credential.sh`, ARGS, true).catch( err => {
+            if ( typeof err === 'string' && err.includes("Unauthorized")) {
+                error = "401_UNAUTHORIZED";
+            }
+        });
+        return error ?? true;
     },
     async getOfficialRegistry(){
         return terminal.execute(`docker info --format '{{json .}}'`).then( response => {
